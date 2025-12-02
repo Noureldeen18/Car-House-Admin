@@ -321,6 +321,11 @@ async function renderProductsPage() {
           </div>
 
           <input type="hidden" id="product-id" />
+          
+          <div class="flex flex-col gap-1 mt-1">
+            <label for="product-image" class="text-[11px] text-slate-300 font-medium">Product Image</label>
+            <input id="product-image" type="file" accept="image/*" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 file:mr-4 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-orange-500 file:text-slate-950 hover:file:bg-orange-400" />
+          </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
             <div class="flex flex-col gap-1">
@@ -385,6 +390,7 @@ function attachProductHandlers() {
   document.getElementById('btn-add-product')?.addEventListener('click', () => {
     document.getElementById('product-modal-title').textContent = 'New product';
     document.getElementById('product-id').value = '';
+    document.getElementById('product-image').value = ''; // Reset file input
     document.getElementById('product-form').reset();
     document.getElementById('product-form-message').textContent = '';
     modal.classList.remove('hidden');
@@ -414,6 +420,7 @@ function attachProductHandlers() {
 
       document.getElementById('product-modal-title').textContent = 'Edit product';
       document.getElementById('product-id').value = product.id;
+      document.getElementById('product-image').value = ''; // Reset file input
       document.getElementById('product-name').value = product.name;
       document.getElementById('product-brand').value = product.brand || '';
       document.getElementById('product-category').value = product.category_id || '';
@@ -446,11 +453,33 @@ function attachProductHandlers() {
     btn.disabled = true;
     btn.textContent = 'Saving...';
 
+    // 1. Save Product Data
     const result = id
       ? await DatabaseService.updateProduct(id, data)
       : await DatabaseService.createProduct(data);
 
     if (result.success) {
+      // 2. Handle Image Upload if selected
+      const imageFile = document.getElementById('product-image').files[0];
+      if (imageFile) {
+        try {
+          const productId = result.data.id;
+          const imageUrl = await DatabaseService.uploadFile(imageFile, 'products');
+
+          if (imageUrl) {
+            await DatabaseService.addProductImage(productId, {
+              url: imageUrl,
+              alt: data.title,
+              position: 0
+            });
+          }
+        } catch (uploadError) {
+          console.error('Image upload failed:', uploadError);
+          // Don't fail the whole operation, just warn
+          alert('Product saved, but image upload failed: ' + uploadError.message);
+        }
+      }
+
       msg.textContent = 'Saved successfully!';
       msg.className = 'text-[11px] text-teal-400';
       setTimeout(() => {
@@ -534,8 +563,9 @@ async function renderCategoriesPage() {
             </div>
 
             <div class="flex flex-col gap-1">
-              <label for="category-icon" class="text-[11px] text-slate-300 font-medium">Icon (emoji)</label>
-              <input id="category-icon" type="text" maxlength="4" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100" />
+              <label for="category-icon" class="text-[11px] text-slate-300 font-medium">Icon (Image)</label>
+              <input id="category-icon" type="file" accept="image/*" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 file:mr-4 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-500 file:text-slate-950 hover:file:bg-teal-400" />
+              <input type="hidden" id="category-icon-url" />
             </div>
 
             <div class="flex flex-col gap-1">
@@ -599,7 +629,9 @@ function attachCategoryHandlers() {
       document.getElementById('category-modal-title').textContent = 'Edit category';
       document.getElementById('category-id').value = category.id;
       document.getElementById('category-name').value = category.name;
-      document.getElementById('category-icon').value = category.icon || '';
+      document.getElementById('category-icon-url').value = category.icon || '';
+      // Reset file input
+      document.getElementById('category-icon').value = '';
       document.getElementById('category-description').value = category.description || '';
       modal.classList.remove('hidden');
     }
@@ -612,14 +644,30 @@ function attachCategoryHandlers() {
     const btn = document.getElementById('btn-save-category');
     const id = document.getElementById('category-id').value;
 
-    const data = {
-      name: document.getElementById('category-name').value,
-      icon: document.getElementById('category-icon').value || '🏷️',
-      description: document.getElementById('category-description').value
-    };
-
     btn.disabled = true;
     btn.textContent = 'Saving...';
+
+    let iconUrl = document.getElementById('category-icon-url').value;
+    const iconFile = document.getElementById('category-icon').files[0];
+
+    if (iconFile) {
+      try {
+        const uploadedUrl = await DatabaseService.uploadFile(iconFile, 'categories');
+        if (uploadedUrl) iconUrl = uploadedUrl;
+      } catch (error) {
+        console.error('Upload failed:', error);
+        msg.textContent = 'Image upload failed: ' + error.message;
+        btn.disabled = false;
+        btn.textContent = 'Save';
+        return;
+      }
+    }
+
+    const data = {
+      name: document.getElementById('category-name').value,
+      icon: iconUrl || '🏷️', // Fallback to emoji if no image
+      description: document.getElementById('category-description').value
+    };
 
     const result = id
       ? await DatabaseService.updateCategory(id, data)

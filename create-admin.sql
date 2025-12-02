@@ -14,7 +14,7 @@ WHERE email = 'YOUR_EMAIL_HERE';  -- Replace with your email
 -- Copy your user ID from Step 2 and use it below:
 INSERT INTO public.admins (user_id, role, meta)
 VALUES (
-  'YOUR_USER_ID_FROM_STEP_2',  -- Replace with actual UUID
+  '8c701632-1372-455e-92dd-ba19851b9464',  -- Replace with actual UUID
   'superadmin',                 -- Or: 'product_manager', 'order_manager', etc.
   '{"permissions": ["all"], "level": "full"}'::jsonb
 );

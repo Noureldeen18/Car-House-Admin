@@ -8,6 +8,43 @@
 const DatabaseService = {
 
     /* ========================================== */
+    /* FILE UPLOAD */
+    /* ========================================== */
+
+    /**
+     * Upload a file to Supabase Storage
+     * @param {File} file - The file object to upload
+     * @param {string} bucket - 'categories' or 'products'
+     * @returns {Promise<string|null>} Public URL of the uploaded file
+     */
+    async uploadFile(file, bucket) {
+        try {
+            if (!file) return null;
+
+            // Create a unique file name
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            const { data, error } = await supabase.storage
+                .from(bucket)
+                .upload(filePath, file);
+
+            if (error) throw error;
+
+            // Get public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from(bucket)
+                .getPublicUrl(filePath);
+
+            return publicUrl;
+        } catch (error) {
+            console.error(`Error uploading to ${bucket}:`, error);
+            throw error;
+        }
+    },
+
+    /* ========================================== */
     /* CATEGORIES */
     /* ========================================== */
 
