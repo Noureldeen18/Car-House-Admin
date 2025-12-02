@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full w-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Car House</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="h-full w-full m-0 p-0 bg-slate-950">
+  <!-- Main container -->
+  <div class="w-full h-full flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-md">
+      <!-- Logo and header -->
+      <div class="text-center mb-8 fade-in">
+        <div class="flex items-center justify-center w-16 h-16 rounded-2xl bg-orange-500/90 text-slate-950 font-bold text-2xl mx-auto mb-4">
+          <span aria-hidden="true">🚗</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-100 mb-2">Car House</h1>
+        <p class="text-sm text-slate-400">Admin Panel Login</p>
+      </div>
+
+      <!-- Login form card -->
+      <div class="card-elevated rounded-2xl bg-slate-900/80 border border-slate-800/80 px-6 py-8 fade-in">
+        <form id="login-form" class="space-y-5">
+          <!-- Email field -->
+          <div class="space-y-2">
+            <label for="email" class="block text-sm font-medium text-slate-300">
+              Email Address
+            </label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              required 
+              autocomplete="email"
+              placeholder="admin@carhouse.com"
+              class="focus-outline w-full px-4 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-500 text-sm"
+            />
+          </div>
+
+          <!-- Password field -->
+          <div class="space-y-2">
+            <label for="password" class="block text-sm font-medium text-slate-300">
+              Password
+            </label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              required 
+              autocomplete="current-password"
+              placeholder="••••••••"
+              class="focus-outline w-full px-4 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-500 text-sm"
+            />
+          </div>
+
+          <!-- Error message -->
+          <div id="error-message" class="hidden rounded-lg bg-orange-500/10 border border-orange-500/40 px-4 py-3">
+            <p class="text-sm text-orange-300"></p>
+          </div>
+
+          <!-- Success message -->
+          <div id="success-message" class="hidden rounded-lg bg-teal-500/10 border border-teal-500/40 px-4 py-3">
+            <p class="text-sm text-teal-300"></p>
+          </div>
+
+          <!-- Submit button -->
+          <button 
+            type="submit" 
+            id="login-btn"
+            class="focus-outline w-full px-4 py-2.5 rounded-lg bg-orange-500 text-slate-950 font-semibold text-sm hover:bg-orange-400 transition-colors"
+          >
+            Sign In
+          </button>
+
+          <!-- Register link -->
+          <div class="text-center pt-4 border-t border-slate-800">
+            <p class="text-sm text-slate-400">
+              Don't have an account? 
+              <a href="register.html" class="text-orange-400 hover:text-orange-300 font-medium">
+                Register here
+              </a>
+            </p>
+          </div>
+        </form>
+      </div>
+
+      <!-- Footer -->
+      <div class="text-center mt-8">
+        <p class="text-xs text-slate-500">
+          Car House Admin Panel · Secure Login
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Initialize Supabase
+    document.addEventListener('DOMContentLoaded', async () => {
+      initializeSupabase();
+
+      // Check if user is already logged in
+      const session = await AuthService.getSession();
+      if (session) {
+        // Redirect to admin panel
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Handle form submission
+      const form = document.getElementById('login-form');
+      const errorMsg = document.getElementById('error-message');
+      const successMsg = document.getElementById('success-message');
+      const loginBtn = document.getElementById('login-btn');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Hide messages
+        errorMsg.classList.add('hidden');
+        successMsg.classList.add('hidden');
+
+        // Get form values
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        // Validate
+        if (!email || !password) {
+          errorMsg.querySelector('p').textContent = 'Please fill in all fields.';
+          errorMsg.classList.remove('hidden');
+          return;
+        }
+
+        // Disable button
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Signing in...';
+
+        try {
+          // Login
+          const result = await AuthService.login(email, password);
+
+          if (result.success) {
+            // Check if user is admin
+            if (result.user.role === 'admin') {
+              successMsg.querySelector('p').textContent = 'Login successful! Redirecting...';
+              successMsg.classList.remove('hidden');
+              
+              setTimeout(() => {
+                window.location.href = 'index.html';
+              }, 1000);
+            } else {
+              errorMsg.querySelector('p').textContent = 'Access denied. Admin privileges required.';
+              errorMsg.classList.remove('hidden');
+              await AuthService.logout();
+              loginBtn.disabled = false;
+              loginBtn.textContent = 'Sign In';
+            }
+          } else {
+            errorMsg.querySelector('p').textContent = result.error || 'Login failed. Please try again.';
+            errorMsg.classList.remove('hidden');
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Sign In';
+          }
+        } catch (error) {
+          errorMsg.querySelector('p').textContent = 'An error occurred. Please try again.';
+          errorMsg.classList.remove('hidden');
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Sign In';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,588 @@
+/* ========================================== */
+/* DATABASE SERVICE - UPDATED FOR NEW SCHEMA */
+/* ========================================== */
+
+/**
+ * Database service for all CRUD operations with new schema
+ */
+const DatabaseService = {
+
+    /* ========================================== */
+    /* CATEGORIES */
+    /* ========================================== */
+
+    async getCategories() {
+        try {
+            const { data, error } = await supabase
+                .from('categories')
+                .select('*')
+                .order('name', { ascending: true });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            return [];
+        }
+    },
+
+    async createCategory(category) {
+        try {
+            const { data, error } = await supabase
+                .from('categories')
+                .insert([category])
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            // Log action
+            await AuthService.logAction('create', 'category', data.id, { name: category.name });
+
+            return { success: true, data };
+        } catch (error) {
+            console.error('Error creating category:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async updateCategory(id, updates) {
+        try {
+            const { data, error } = await supabase
+                .from('categories')
+                .update(updates)
+                .eq('id', id)
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            await AuthService.logAction('update', 'category', id, updates);
+
+            return { success: true, data };
+        } catch (error) {
+            console.error('Error updating category:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async deleteCategory(id) {
+        try {
+            const { error } = await supabase
+                .from('categories')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            await AuthService.logAction('delete', 'category', id);
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error deleting category:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /* ========================================== */
+    /* PRODUCTS */
+    /* ========================================== */
+
+    async getProducts() {
+        try {
+            const { data, error } = await supabase
+                .from('products')
+                .select(`
+          *,
+          category:categories(id, name, slug),
+          images:product_images(id, url, alt, position)
+        `)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            // Get inventory for each product
+            const productsWithInventory = await Promise.all(
+                data.map(async (product) => {
+                    const { data: inventory } = await supabase
+                        .from('inventory')
+                        .select('quantity, reserved, store:stores(name)')
+                        .eq('product_id', product.id);
+
+                    const totalStock = inventory?.reduce((sum, inv) => sum + inv.quantity, 0) || 0;
+
+                    return {
+                        ...product,
+                        inventory,
+                        total_stock: totalStock
+                    };
+                })
+            );
+
+            return productsWithInventory;
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            return [];
+        }
+    },
+
+    async createProduct(product) {
+        try {
+            const { data, error } = await supabase
+                .from('products')
+                .insert([product])
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            await AuthService.logAction('create', 'product', data.id, { title: product.title });
+
+            return { success: true, data };
+        } catch (error) {
+            console.error('Error creating product:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async updateProduct(id, updates) {
+        try {
+            const { data, error } = await supabase
+                .from('products')
+                .update(updates)
+                .eq('id', id)
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            await AuthService.logAction('update', 'product', id, updates);
+
+            return { success: true, data };
+        } catch (error) {
+            console.error('Error updating product:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async deleteProduct(id) {
+        try {
+            const { error } = await supabase
+                .from('products')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            await AuthService.logAction('delete', 'product', id);
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /* ========================================== */
+    /* PRODUCT IMAGES */
+    /* ========================================== */
+
+    async addProductImage(productId, imageData) {
+        try {
+            const { data, error } = await supabase
+                .from('product_images')
+                .insert([{ product_id: productId, ...imageData }])
+                .select()
+                .single();
+
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            console.error('Error adding product image:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /* ========================================== */
+    /* INVENTORY */
+    /* ========================================== */
+
+    async updateInventory(productId, storeId, quantity) {
+        try {
+            const { data, error } = await supabase
+                .from('inventory')
+                .upsert({
+                    product_id: productId,
+                    store_id: storeId,
+                    quantity,
+                    updated_at: new Date().toISOString()
+                })
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            await AuthService.logAction('update_inventory', 'product', productId, { storeId, quantity });
+
+            return { success: true, data };
+        } catch (error) {
+            console.error('Error updating inventory:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /* ========================================== */
+    /* PROFILES (USERS) */
+    /* ========================================== */
+
+    async getProfiles() {
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            // Check which users are admins
+            const { data: admins } = await supabase
+                .from('admins')
+                .select('user_id, role');
+
+            const adminMap = new Map(admins?.map(a => [a.user_id, a.role]) || []);
+
+            return data.map(profile => ({
+                ...profile,
+                isAdmin: adminMap.has(profile.id),
+                adminRole: adminMap.get(profile.id) || null
+            }));
+        } catch (error) {
+            console.error('Error fetching profiles:', error);
+            return [];
+        }
+    },
+
+    async updateProfile(id, updates) {
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .update(updates)
+                .eq('id', id)
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            await AuthService.logAction('update', 'profile', id, updates);
+
+            return { success: true, data };
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /* ========================================== */
+    /* ADMINS */
+    /* ========================================== */
+
+    async addAdmin(userId, role, meta = {}) {
+        try {
+            const { data, error } = await supabase
+                .from('admins')
+                .insert([{ user_id: userId, role, meta }])
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            await AuthService.logAction('add_admin', 'admin', data.id, { userId, role });
+
+            return { success: true, data };
+        } catch (error) {
+            console.error('Error adding admin:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async removeAdmin(userId) {
+        try {
+            const { error } = await supabase
+                .from('admins')
+                .delete()
+                .eq('user_id', userId);
+
+            if (error) throw error;
+
+            await AuthService.logAction('remove_admin', 'admin', userId);
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error removing admin:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /* ========================================== */
+    /* ORDERS */
+    /* ========================================== */
+
+    async getOrders() {
+        try {
+            const { data, error } = await supabase
+                .from('orders')
+                .select(`
+          *,
+          profile:profiles(id, email, full_name, phone),
+          items:order_items(*)
+        `)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            return [];
+        }
+    },
+
+    async updateOrderStatus(id, status) {
+        try {
+            const { data, error } = await supabase
+                .from('orders')
+                .update({ status, updated_at: new Date().toISOString() })
+                .eq('id', id)
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            await AuthService.logAction('update_status', 'order', id, { status });
+
+            return { success: true, data };
+        } catch (error) {
+            console.error('Error updating order:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async createOrder(orderData) {
+        try {
+            const { data: order, error: orderError } = await supabase
+                .from('orders')
+                .insert([{
+                    user_id: orderData.user_id,
+                    total_amount: orderData.total_amount,
+                    status: 'pending',
+                    shipping_address: orderData.shipping_address,
+                    billing_address: orderData.billing_address,
+                    payment_meta: orderData.payment_meta
+                }])
+                .select()
+                .single();
+
+            if (orderError) throw orderError;
+
+            // Create order items
+            const items = orderData.items.map(item => ({
+                order_id: order.id,
+                product_id: item.product_id,
+                sku: item.sku,
+                title: item.title,
+                unit_price: item.unit_price,
+                quantity: item.quantity,
+                subtotal: item.unit_price * item.quantity
+            }));
+
+            const { error: itemsError } = await supabase
+                .from('order_items')
+                .insert(items);
+
+            if (itemsError) throw itemsError;
+
+            await AuthService.logAction('create', 'order', order.id, { total: orderData.total_amount });
+
+            return { success: true, data: order };
+        } catch (error) {
+            console.error('Error creating order:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /* ========================================== */
+    /* REVIEWS */
+    /* ========================================== */
+
+    async getReviews(productId = null) {
+        try {
+            let query = supabase
+                .from('reviews')
+                .select(`
+          *,
+          profile:profiles(full_name, avatar_url),
+          product:products(title)
+        `)
+                .order('created_at', { ascending: false });
+
+            if (productId) {
+                query = query.eq('product_id', productId);
+            }
+
+            const { data, error } = await query;
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Error fetching reviews:', error);
+            return [];
+        }
+    },
+
+    async toggleReviewVisibility(id, isVisible) {
+        try {
+            const { data, error } = await supabase
+                .from('reviews')
+                .update({ is_visible: isVisible })
+                .eq('id', id)
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            await AuthService.logAction('toggle_visibility', 'review', id, { isVisible });
+
+            return { success: true, data };
+        } catch (error) {
+            console.error('Error toggling review:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /* ========================================== */
+    /* COUPONS */
+    /* ========================================== */
+
+    async getCoupons() {
+        try {
+            const { data, error } = await supabase
+                .from('coupons')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Error fetching coupons:', error);
+            return [];
+        }
+    },
+
+    async createCoupon(coupon) {
+        try {
+            const { data, error } = await supabase
+                .from('coupons')
+                .insert([coupon])
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            await AuthService.logAction('create', 'coupon', data.id, { code: coupon.code });
+
+            return { success: true, data };
+        } catch (error) {
+            console.error('Error creating coupon:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async toggleCoupon(id, isActive) {
+        try {
+            const { data, error } = await supabase
+                .from('coupons')
+                .update({ is_active: isActive })
+                .eq('id', id)
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            await AuthService.logAction('toggle', 'coupon', id, { isActive });
+
+            return { success: true, data };
+        } catch (error) {
+            console.error('Error toggling coupon:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /* ========================================== */
+    /* AUDIT LOGS */
+    /* ========================================== */
+
+    async getAuditLogs(limit = 100) {
+        try {
+            const { data, error } = await supabase
+                .from('audit_logs')
+                .select(`
+          *,
+          profile:profiles(full_name, email)
+        `)
+                .order('created_at', { ascending: false })
+                .limit(limit);
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Error fetching audit logs:', error);
+            return [];
+        }
+    },
+
+    /* ========================================== */
+    /* STATISTICS */
+    /* ========================================== */
+
+    async getStatistics() {
+        try {
+            const [products, categories, orders, profiles, reviews] = await Promise.all([
+                this.getProducts(),
+                this.getCategories(),
+                this.getOrders(),
+                this.getProfiles(),
+                this.getReviews()
+            ]);
+
+            const totalRevenue = orders.reduce((sum, order) =>
+                sum + parseFloat(order.total_amount || 0), 0
+            );
+
+            const pendingOrders = orders.filter(o => o.status === 'pending').length;
+            const averageRating = reviews.length > 0
+                ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+                : 0;
+
+            return {
+                totalProducts: products.length,
+                totalCategories: categories.length,
+                totalOrders: orders.length,
+                totalUsers: profiles.length,
+                totalRevenue,
+                pendingOrders,
+                totalReviews: reviews.length,
+                averageRating: averageRating.toFixed(1)
+            };
+        } catch (error) {
+            console.error('Error fetching statistics:', error);
+            return {
+                totalProducts: 0,
+                totalCategories: 0,
+                totalOrders: 0,
+                totalUsers: 0,
+                totalRevenue: 0,
+                pendingOrders: 0,
+                totalReviews: 0,
+                averageRating: 0
+            };
+        }
+    }
+};
