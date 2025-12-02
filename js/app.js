@@ -24,12 +24,12 @@ const config = {
 /* ========================================== */
 
 /**
- * Formats a number as currency (USD)
+ * Formats a number as currency (EGP)
  * @param {number} value - The numeric value to format
  * @returns {string} Formatted currency string
  */
 function formatCurrency(value) {
-  return "$" + value.toFixed(2);
+  return "EGP" + value.toFixed(2);
 }
 
 /**
@@ -343,7 +343,7 @@ async function renderProductsPage() {
               <input id="product-car-model" type="text" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100" />
             </div>
             <div class="flex flex-col gap-1">
-              <label for="product-price" class="text-[11px] text-slate-300 font-medium">Price (USD)</label>
+              <label for="product-price" class="text-[11px] text-slate-300 font-medium">Price (EGP)</label>
               <input id="product-price" type="number" step="0.01" min="0" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100" />
             </div>
             <div class="flex flex-col gap-1">
@@ -901,3 +901,4 @@ function attachSidebarNav() {
   // Show dashboard
   setActivePage("dashboard");
 })();
+
