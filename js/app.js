@@ -29,7 +29,7 @@ const config = {
  * @returns {string} Formatted currency string
  */
 function formatCurrency(value) {
-  return "EGP " + value.toFixed(2);
+  return "$" + value.toFixed(2);
 }
 
 /**
@@ -901,3 +901,4 @@ function attachSidebarNav() {
   // Show dashboard
   setActivePage("dashboard");
 })();
+
