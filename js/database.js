@@ -320,6 +320,28 @@ const DatabaseService = {
     },
 
     /* ========================================== */
+    /* USERS (BACKWARD COMPATIBILITY WRAPPERS) */
+    /* ========================================== */
+
+    /**
+     * Get all users (wrapper for getProfiles)
+     * @returns {Promise<Array>} List of users
+     */
+    async getUsers() {
+        return await this.getProfiles();
+    },
+
+    /**
+     * Update user (wrapper for updateProfile)
+     * @param {string} id - User ID
+     * @param {Object} updates - Updates to apply
+     * @returns {Promise<Object>} Result
+     */
+    async updateUser(id, updates) {
+        return await this.updateProfile(id, updates);
+    },
+
+    /* ========================================== */
     /* ADMINS */
     /* ========================================== */
 

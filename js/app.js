@@ -1,5 +1,6 @@
 /* ========================================== */
 /* CAR HOUSE - ADMIN PANEL APPLICATION */
+/* Light Mode Version */
 /* ========================================== */
 
 /* ========================================== */
@@ -59,27 +60,27 @@ function createBaseLayout() {
 
   const appWrapper = document.createElement("div");
   appWrapper.id = "app-wrapper";
-  appWrapper.className = "w-full h-full flex flex-col bg-slate-950 text-slate-100 font-sans";
+  appWrapper.className = "w-full h-full flex flex-col bg-slate-50 text-slate-800 font-sans";
 
   /* ====================================== */
   /* TOP HEADER BAR */
   /* ====================================== */
 
   const header = document.createElement("header");
-  header.className = "w-full flex items-center justify-between px-6 py-3 border-b border-slate-800 bg-slate-950/95";
+  header.className = "w-full flex items-center justify-between px-6 py-3 border-b border-slate-200 bg-white shadow-sm";
   header.innerHTML = `
     <div class="flex items-center gap-3">
-      <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-orange-500/90 text-slate-950 font-semibold text-lg">
+      <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-orange-500 text-white font-semibold text-lg shadow-md">
         <span aria-hidden="true">🚗</span>
       </div>
       <div class="flex flex-col">
-        <h1 id="app-title" class="text-sm sm:text-base font-semibold tracking-tight">${config.app_title}</h1>
-        <p class="text-[11px] sm:text-xs text-slate-400">Manage products, orders & customers</p>
+        <h1 id="app-title" class="text-sm sm:text-base font-semibold tracking-tight text-slate-800">${config.app_title}</h1>
+        <p class="text-[11px] sm:text-xs text-slate-500">Manage products, orders & customers</p>
       </div>
     </div>
-    <div class="flex items-center gap-3 text-xs sm:text-sm text-slate-400">
+    <div class="flex items-center gap-3 text-xs sm:text-sm text-slate-600">
       <span class="hidden sm:inline" id="user-name">Admin</span>
-      <button id="logout-btn" class="focus-outline px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-xs text-slate-200 hover:border-orange-500 hover:text-orange-300">
+      <button id="logout-btn" class="focus-outline px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs text-slate-700 hover:border-orange-500 hover:text-orange-600 shadow-sm">
         Logout
       </button>
     </div>
@@ -98,50 +99,50 @@ function createBaseLayout() {
 
   const sidebar = document.createElement("aside");
   sidebar.id = "sidebar";
-  sidebar.className = "w-56 md:w-64 h-full bg-slate-950 border-r border-slate-800 flex flex-col";
+  sidebar.className = "w-56 md:w-64 h-full bg-white border-r border-slate-200 flex flex-col shadow-sm";
   sidebar.innerHTML = `
     <nav class="flex-1 overflow-y-auto app-scrollbar py-4">
       <ul class="space-y-1 px-3" aria-label="Main navigation">
         <li>
-          <button data-page="dashboard" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:bg-slate-800 focus-outline">
-            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-slate-900 text-orange-400 text-sm">📊</span>
+          <button data-page="dashboard" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 focus-outline">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-orange-50 text-orange-500 text-sm">📊</span>
             <span>Dashboard</span>
           </button>
         </li>
         <li>
-          <button data-page="products" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:bg-slate-800 focus-outline">
-            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-slate-900 text-teal-400 text-sm">🛠️</span>
+          <button data-page="products" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 focus-outline">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-teal-50 text-teal-600 text-sm">🛠️</span>
             <span>Products</span>
           </button>
         </li>
         <li>
-          <button data-page="categories" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:bg-slate-800 focus-outline">
-            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-slate-900 text-orange-300 text-sm">🏷️</span>
+          <button data-page="categories" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 focus-outline">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-orange-50 text-orange-500 text-sm">🏷️</span>
             <span>Categories</span>
           </button>
         </li>
         <li>
-          <button data-page="orders" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:bg-slate-800 focus-outline">
-            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-slate-900 text-teal-300 text-sm">📦</span>
+          <button data-page="orders" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 focus-outline">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-teal-50 text-teal-600 text-sm">📦</span>
             <span>Orders</span>
           </button>
         </li>
         <li>
-          <button data-page="users" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:bg-slate-800 focus-outline">
-            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-slate-900 text-orange-200 text-sm">👥</span>
+          <button data-page="users" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 focus-outline">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-orange-50 text-orange-500 text-sm">👥</span>
             <span>Users</span>
           </button>
         </li>
       </ul>
     </nav>
-    <div class="px-3 py-3 border-t border-slate-800 text-[11px] text-slate-500">
+    <div class="px-3 py-3 border-t border-slate-200 text-[11px] text-slate-500">
       <p id="footer-text" class="truncate">${config.footer_text}</p>
     </div>
   `;
 
   const main = document.createElement("main");
   main.id = "main-content";
-  main.className = "flex-1 h-full overflow-y-auto app-scrollbar bg-slate-950/95";
+  main.className = "flex-1 h-full overflow-y-auto app-scrollbar bg-slate-50";
   main.setAttribute("role", "main");
   main.setAttribute("aria-live", "polite");
 
@@ -167,7 +168,7 @@ async function renderDashboard() {
   if (!main) return;
 
   // Show loading
-  main.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p class="text-slate-400">Loading...</p></div>';
+  main.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p class="text-slate-500">Loading...</p></div>';
 
   // Fetch statistics
   const stats = await DatabaseService.getStatistics();
@@ -176,45 +177,45 @@ async function renderDashboard() {
     <section class="w-full h-full px-4 sm:px-6 py-4 flex flex-col gap-4 fade-in">
       <header class="flex items-center justify-between gap-3">
         <div>
-          <h2 class="text-base sm:text-lg font-semibold tracking-tight">${config.dashboard_title}</h2>
-          <p class="text-[11px] sm:text-xs text-slate-400 mt-1">Quick overview of your car spare parts store.</p>
+          <h2 class="text-base sm:text-lg font-semibold tracking-tight text-slate-800">${config.dashboard_title}</h2>
+          <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Quick overview of your car spare parts store.</p>
         </div>
       </header>
 
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-1">
-        <article class="card-elevated rounded-xl bg-slate-900/80 border border-slate-800/80 px-3 py-3 flex flex-col gap-2">
+        <article class="card-elevated rounded-xl bg-white border border-slate-200 px-3 py-3 flex flex-col gap-2 shadow-sm">
           <div class="flex items-center justify-between">
-            <h3 class="text-[11px] text-slate-400 font-medium">Total Products</h3>
-            <span class="text-xs px-2 py-[1px] rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/40">Inventory</span>
+            <h3 class="text-[11px] text-slate-500 font-medium">Total Products</h3>
+            <span class="text-xs px-2 py-[1px] rounded-full bg-orange-50 text-orange-600 border border-orange-200">Inventory</span>
           </div>
-          <p class="text-lg font-semibold">${stats.totalProducts}</p>
+          <p class="text-lg font-semibold text-slate-800">${stats.totalProducts}</p>
           <p class="text-[11px] text-slate-500">Active spare parts in catalog</p>
         </article>
 
-        <article class="card-elevated rounded-xl bg-slate-900/80 border border-slate-800/80 px-3 py-3 flex flex-col gap-2">
+        <article class="card-elevated rounded-xl bg-white border border-slate-200 px-3 py-3 flex flex-col gap-2 shadow-sm">
           <div class="flex items-center justify-between">
-            <h3 class="text-[11px] text-slate-400 font-medium">Categories</h3>
-            <span class="text-xs px-2 py-[1px] rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/40">Structure</span>
+            <h3 class="text-[11px] text-slate-500 font-medium">Categories</h3>
+            <span class="text-xs px-2 py-[1px] rounded-full bg-teal-50 text-teal-600 border border-teal-200">Structure</span>
           </div>
-          <p class="text-lg font-semibold">${stats.totalCategories}</p>
+          <p class="text-lg font-semibold text-slate-800">${stats.totalCategories}</p>
           <p class="text-[11px] text-slate-500">Groups for easy browsing</p>
         </article>
 
-        <article class="card-elevated rounded-xl bg-slate-900/80 border border-slate-800/80 px-3 py-3 flex flex-col gap-2">
+        <article class="card-elevated rounded-xl bg-white border border-slate-200 px-3 py-3 flex flex-col gap-2 shadow-sm">
           <div class="flex items-center justify-between">
-            <h3 class="text-[11px] text-slate-400 font-medium">Orders</h3>
-            <span class="text-xs px-2 py-[1px] rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/40">Activity</span>
+            <h3 class="text-[11px] text-slate-500 font-medium">Orders</h3>
+            <span class="text-xs px-2 py-[1px] rounded-full bg-orange-50 text-orange-600 border border-orange-200">Activity</span>
           </div>
-          <p class="text-lg font-semibold">${stats.totalOrders}</p>
+          <p class="text-lg font-semibold text-slate-800">${stats.totalOrders}</p>
           <p class="text-[11px] text-slate-500">Customer purchases</p>
         </article>
 
-        <article class="card-elevated rounded-xl bg-slate-900/80 border border-slate-800/80 px-3 py-3 flex flex-col gap-2">
+        <article class="card-elevated rounded-xl bg-white border border-slate-200 px-3 py-3 flex flex-col gap-2 shadow-sm">
           <div class="flex items-center justify-between">
-            <h3 class="text-[11px] text-slate-400 font-medium">Revenue</h3>
-            <span class="text-xs px-2 py-[1px] rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/40">Total</span>
+            <h3 class="text-[11px] text-slate-500 font-medium">Revenue</h3>
+            <span class="text-xs px-2 py-[1px] rounded-full bg-teal-50 text-teal-600 border border-teal-200">Total</span>
           </div>
-          <p class="text-lg font-semibold">${formatCurrency(stats.totalRevenue)}</p>
+          <p class="text-lg font-semibold text-slate-800">${formatCurrency(stats.totalRevenue)}</p>
           <p class="text-[11px] text-slate-500">Total sales revenue</p>
         </article>
       </div>
@@ -231,7 +232,7 @@ async function renderProductsPage() {
   if (!main) return;
 
   // Show loading
-  main.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p class="text-slate-400">Loading products...</p></div>';
+  main.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p class="text-slate-500">Loading products...</p></div>';
 
   // Fetch products and categories
   const [products, categories] = await Promise.all([
@@ -240,26 +241,26 @@ async function renderProductsPage() {
   ]);
 
   const rowsHtml = products.map(p => `
-    <tr class="border-b border-slate-800/80 hover:bg-slate-900/60">
+    <tr class="border-b border-slate-200 hover:bg-slate-50">
       <td class="px-3 py-2">
-        <div class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-lg">${p.category?.icon || '🛠️'}</div>
+        <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-lg">${p.category?.icon || '🛠️'}</div>
       </td>
       <td class="px-3 py-2 text-xs sm:text-sm">
-        <div class="font-medium">${p.name}</div>
-        <div class="text-[11px] text-slate-400">${p.car_model || 'Universal'}</div>
+        <div class="font-medium text-slate-800">${p.name}</div>
+        <div class="text-[11px] text-slate-500">${p.car_model || 'Universal'}</div>
       </td>
-      <td class="px-3 py-2 text-[11px] sm:text-xs text-slate-300">${p.category?.name || 'N/A'}</td>
-      <td class="px-3 py-2 text-[11px] sm:text-xs text-slate-300">${p.brand || 'N/A'}</td>
-      <td class="px-3 py-2 text-[11px] sm:text-xs text-orange-300 font-medium">${formatCurrency(p.price)}</td>
+      <td class="px-3 py-2 text-[11px] sm:text-xs text-slate-600">${p.category?.name || 'N/A'}</td>
+      <td class="px-3 py-2 text-[11px] sm:text-xs text-slate-600">${p.brand || 'N/A'}</td>
+      <td class="px-3 py-2 text-[11px] sm:text-xs text-orange-600 font-medium">${formatCurrency(p.price)}</td>
       <td class="px-3 py-2 text-[11px] sm:text-xs">
-        <span class="inline-flex items-center rounded-full px-2 py-[1px] border border-slate-700 text-slate-200">
+        <span class="inline-flex items-center rounded-full px-2 py-[1px] border border-slate-300 text-slate-700 bg-slate-50">
           ${p.stock} in stock
         </span>
       </td>
       <td class="px-3 py-2">
         <div class="flex flex-wrap gap-1.5">
-          <button data-action="edit-product" data-id="${p.id}" class="focus-outline text-[11px] px-2 py-[2px] rounded-full bg-slate-800 text-slate-100 border border-slate-700 hover:border-teal-400 hover:text-teal-300">Edit</button>
-          <button data-action="delete-product" data-id="${p.id}" class="focus-outline text-[11px] px-2 py-[2px] rounded-full bg-slate-900 text-slate-300 border border-slate-800 hover:border-orange-500 hover:text-orange-300">Delete</button>
+          <button data-action="edit-product" data-id="${p.id}" class="focus-outline text-[11px] px-2 py-[2px] rounded-full bg-white text-slate-700 border border-slate-300 hover:border-teal-500 hover:text-teal-600">Edit</button>
+          <button data-action="delete-product" data-id="${p.id}" class="focus-outline text-[11px] px-2 py-[2px] rounded-full bg-white text-slate-600 border border-slate-300 hover:border-red-500 hover:text-red-600">Delete</button>
         </div>
       </td>
     </tr>
@@ -273,24 +274,24 @@ async function renderProductsPage() {
     <section class="w-full h-full px-4 sm:px-6 py-4 flex flex-col gap-4 fade-in">
       <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 class="text-base sm:text-lg font-semibold tracking-tight">${config.products_title}</h2>
-          <p class="text-[11px] sm:text-xs text-slate-400 mt-1">Manage car spare parts inventory, prices and compatibility.</p>
+          <h2 class="text-base sm:text-lg font-semibold tracking-tight text-slate-800">${config.products_title}</h2>
+          <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Manage car spare parts inventory, prices and compatibility.</p>
         </div>
-        <button id="btn-add-product" class="focus-outline inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500 text-slate-950 text-xs sm:text-sm font-semibold shadow-sm hover:bg-orange-400">
+        <button id="btn-add-product" class="focus-outline inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500 text-white text-xs sm:text-sm font-semibold shadow-md hover:bg-orange-600">
           <span class="text-sm">＋</span>
           <span>Add product</span>
         </button>
       </header>
 
-      <div class="flex-1 min-h-0 rounded-xl bg-slate-900/80 border border-slate-800/80 overflow-hidden flex flex-col">
-        <div class="px-3 sm:px-4 py-2 border-b border-slate-800/80">
-          <p class="text-[11px] sm:text-xs text-slate-400">Showing ${products.length} products</p>
+      <div class="flex-1 min-h-0 rounded-xl bg-white border border-slate-200 overflow-hidden flex flex-col shadow-sm">
+        <div class="px-3 sm:px-4 py-2 border-b border-slate-200 bg-slate-50">
+          <p class="text-[11px] sm:text-xs text-slate-500">Showing ${products.length} products</p>
         </div>
 
         <div class="flex-1 overflow-auto app-scrollbar">
           <table class="min-w-full text-left text-xs sm:text-sm">
-            <thead class="bg-slate-900/90 sticky top-0 z-10">
-              <tr class="text-[11px] sm:text-xs text-slate-400 border-b border-slate-800/80">
+            <thead class="bg-slate-50 sticky top-0 z-10">
+              <tr class="text-[11px] sm:text-xs text-slate-500 border-b border-slate-200">
                 <th scope="col" class="px-3 py-2 font-medium">Image</th>
                 <th scope="col" class="px-3 py-2 font-medium">Name & Model</th>
                 <th scope="col" class="px-3 py-2 font-medium">Category</th>
@@ -310,63 +311,63 @@ async function renderProductsPage() {
 
     <div id="product-modal" class="hidden fixed inset-0 flex items-center justify-center z-20">
       <div class="modal-backdrop absolute inset-0" id="modal-backdrop"></div>
-      <div class="relative w-full max-w-md rounded-2xl bg-slate-950 border border-slate-800 shadow-2xl mx-4">
+      <div class="relative w-full max-w-md rounded-2xl bg-white border border-slate-200 shadow-2xl mx-4">
         <form id="product-form" class="flex flex-col gap-3 px-4 sm:px-5 py-4">
           <div class="flex items-start justify-between gap-3">
             <div>
-              <h3 id="product-modal-title" class="text-sm sm:text-base font-semibold">New product</h3>
-              <p class="text-[11px] sm:text-xs text-slate-400 mt-1">Add or update car spare part details.</p>
+              <h3 id="product-modal-title" class="text-sm sm:text-base font-semibold text-slate-800">New product</h3>
+              <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Add or update car spare part details.</p>
             </div>
-            <button type="button" id="btn-close-product-modal" class="focus-outline text-slate-400 hover:text-slate-200 text-lg leading-none">×</button>
+            <button type="button" id="btn-close-product-modal" class="focus-outline text-slate-400 hover:text-slate-600 text-lg leading-none">×</button>
           </div>
 
           <input type="hidden" id="product-id" />
           
           <div class="flex flex-col gap-1 mt-1">
-            <label for="product-image" class="text-[11px] text-slate-300 font-medium">Product Image</label>
-            <input id="product-image" type="file" accept="image/*" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 file:mr-4 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-orange-500 file:text-slate-950 hover:file:bg-orange-400" />
+            <label for="product-image" class="text-[11px] text-slate-600 font-medium">Product Image</label>
+            <input id="product-image" type="file" accept="image/*" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-50 border border-slate-300 text-slate-700 file:mr-4 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-orange-500 file:text-white hover:file:bg-orange-600" />
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
             <div class="flex flex-col gap-1">
-              <label for="product-name" class="text-[11px] text-slate-300 font-medium">Product name</label>
-              <input id="product-name" type="text" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100" />
+              <label for="product-name" class="text-[11px] text-slate-600 font-medium">Product name</label>
+              <input id="product-name" type="text" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
             </div>
             <div class="flex flex-col gap-1">
-              <label for="product-brand" class="text-[11px] text-slate-300 font-medium">Brand</label>
-              <input id="product-brand" type="text" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100" />
+              <label for="product-brand" class="text-[11px] text-slate-600 font-medium">Brand</label>
+              <input id="product-brand" type="text" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
             </div>
             <div class="flex flex-col gap-1">
-              <label for="product-category" class="text-[11px] text-slate-300 font-medium">Category</label>
-              <select id="product-category" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100">
+              <label for="product-category" class="text-[11px] text-slate-600 font-medium">Category</label>
+              <select id="product-category" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800">
                 <option value="">Select category</option>
                 ${categoriesOptions}
               </select>
             </div>
             <div class="flex flex-col gap-1">
-              <label for="product-car-model" class="text-[11px] text-slate-300 font-medium">Car model</label>
-              <input id="product-car-model" type="text" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100" />
+              <label for="product-car-model" class="text-[11px] text-slate-600 font-medium">Car model</label>
+              <input id="product-car-model" type="text" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
             </div>
             <div class="flex flex-col gap-1">
-              <label for="product-price" class="text-[11px] text-slate-300 font-medium">Price (EGP)</label>
-              <input id="product-price" type="number" step="0.01" min="0" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100" />
+              <label for="product-price" class="text-[11px] text-slate-600 font-medium">Price (EGP)</label>
+              <input id="product-price" type="number" step="0.01" min="0" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
             </div>
             <div class="flex flex-col gap-1">
-              <label for="product-stock" class="text-[11px] text-slate-300 font-medium">Stock</label>
-              <input id="product-stock" type="number" min="0" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100" />
+              <label for="product-stock" class="text-[11px] text-slate-600 font-medium">Stock</label>
+              <input id="product-stock" type="number" min="0" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
             </div>
           </div>
 
           <div class="flex flex-col gap-1 mt-1">
-            <label for="product-description" class="text-[11px] text-slate-300 font-medium">Description</label>
-            <textarea id="product-description" rows="2" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100"></textarea>
+            <label for="product-description" class="text-[11px] text-slate-600 font-medium">Description</label>
+            <textarea id="product-description" rows="2" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800"></textarea>
           </div>
 
           <div class="flex items-center justify-between gap-3 mt-1">
-            <p id="product-form-message" class="text-[11px] text-slate-400"></p>
+            <p id="product-form-message" class="text-[11px] text-slate-500"></p>
             <div class="flex items-center gap-2">
-              <button type="button" id="btn-cancel-product" class="focus-outline px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-[11px] sm:text-xs text-slate-200 hover:border-slate-500">Cancel</button>
-              <button type="submit" id="btn-save-product" class="focus-outline px-3 py-1.5 rounded-lg bg-orange-500 text-slate-950 text-[11px] sm:text-xs font-semibold hover:bg-orange-400">Save</button>
+              <button type="button" id="btn-cancel-product" class="focus-outline px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-[11px] sm:text-xs text-slate-700 hover:border-slate-400">Cancel</button>
+              <button type="submit" id="btn-save-product" class="focus-outline px-3 py-1.5 rounded-lg bg-orange-500 text-white text-[11px] sm:text-xs font-semibold hover:bg-orange-600">Save</button>
             </div>
           </div>
         </form>
@@ -481,14 +482,14 @@ function attachProductHandlers() {
       }
 
       msg.textContent = 'Saved successfully!';
-      msg.className = 'text-[11px] text-teal-400';
+      msg.className = 'text-[11px] text-teal-600';
       setTimeout(() => {
         modal.classList.add('hidden');
         renderProductsPage();
       }, 500);
     } else {
       msg.textContent = result.error;
-      msg.className = 'text-[11px] text-orange-400';
+      msg.className = 'text-[11px] text-red-600';
       btn.disabled = false;
       btn.textContent = 'Save';
     }
@@ -503,22 +504,22 @@ async function renderCategoriesPage() {
   const main = document.getElementById("main-content");
   if (!main) return;
 
-  main.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p class="text-slate-400">Loading categories...</p></div>';
+  main.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p class="text-slate-500">Loading categories...</p></div>';
 
   const categories = await DatabaseService.getCategories();
 
   const listHtml = categories.map(c => `
-    <li class="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-slate-900/80 border border-slate-800/80 hover:border-teal-500/60 card-elevated">
+    <li class="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-teal-400 card-elevated shadow-sm">
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-lg">${c.icon || '🏷️'}</div>
+        <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-lg">${c.icon || '🏷️'}</div>
         <div class="flex flex-col">
-          <span class="text-xs sm:text-sm font-medium">${c.name}</span>
+          <span class="text-xs sm:text-sm font-medium text-slate-800">${c.name}</span>
           <span class="text-[10px] text-slate-500">${c.description || ''}</span>
         </div>
       </div>
       <div class="flex items-center gap-1.5">
-        <button data-action="edit-category" data-id="${c.id}" class="focus-outline text-[10px] px-2 py-[2px] rounded-full bg-slate-900 text-slate-200 border border-slate-700 hover:border-teal-400">Edit</button>
-        <button data-action="delete-category" data-id="${c.id}" class="focus-outline text-[10px] px-2 py-[2px] rounded-full bg-slate-900 text-slate-300 border border-slate-800 hover:border-orange-500 hover:text-orange-300">Delete</button>
+        <button data-action="edit-category" data-id="${c.id}" class="focus-outline text-[10px] px-2 py-[2px] rounded-full bg-white text-slate-700 border border-slate-300 hover:border-teal-500 hover:text-teal-600">Edit</button>
+        <button data-action="delete-category" data-id="${c.id}" class="focus-outline text-[10px] px-2 py-[2px] rounded-full bg-white text-slate-600 border border-slate-300 hover:border-red-500 hover:text-red-600">Delete</button>
       </div>
     </li>
   `).join("");
@@ -527,17 +528,17 @@ async function renderCategoriesPage() {
     <section class="w-full h-full px-4 sm:px-6 py-4 flex flex-col gap-4 fade-in">
       <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 class="text-base sm:text-lg font-semibold tracking-tight">${config.categories_title}</h2>
-          <p class="text-[11px] sm:text-xs text-slate-400 mt-1">Organize spare parts into clear, searchable groups.</p>
+          <h2 class="text-base sm:text-lg font-semibold tracking-tight text-slate-800">${config.categories_title}</h2>
+          <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Organize spare parts into clear, searchable groups.</p>
         </div>
-        <button id="btn-add-category" class="focus-outline inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-teal-500 text-slate-950 text-xs sm:text-sm font-semibold shadow-sm hover:bg-teal-400">
+        <button id="btn-add-category" class="focus-outline inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-teal-500 text-white text-xs sm:text-sm font-semibold shadow-md hover:bg-teal-600">
           <span class="text-sm">＋</span>
           <span>Add category</span>
         </button>
       </header>
 
-      <div class="flex-1 min-h-0 rounded-xl bg-slate-900/80 border border-slate-800/80 p-3 sm:p-4 flex flex-col gap-3">
-        <p class="text-[11px] sm:text-xs text-slate-400">You have ${categories.length} categories.</p>
+      <div class="flex-1 min-h-0 rounded-xl bg-slate-50 border border-slate-200 p-3 sm:p-4 flex flex-col gap-3">
+        <p class="text-[11px] sm:text-xs text-slate-500">You have ${categories.length} categories.</p>
         <ul id="categories-list" class="space-y-2 overflow-auto app-scrollbar">
           ${listHtml}
         </ul>
@@ -545,39 +546,39 @@ async function renderCategoriesPage() {
 
       <div id="category-modal" class="hidden fixed inset-0 flex items-center justify-center z-20">
         <div class="modal-backdrop absolute inset-0" id="cat-modal-backdrop"></div>
-        <div class="relative w-full max-w-sm rounded-2xl bg-slate-950 border border-slate-800 shadow-2xl mx-4">
+        <div class="relative w-full max-w-sm rounded-2xl bg-white border border-slate-200 shadow-2xl mx-4">
           <form id="category-form" class="flex flex-col gap-3 px-4 sm:px-5 py-4">
             <div class="flex items-start justify-between gap-3">
               <div>
-                <h3 id="category-modal-title" class="text-sm sm:text-base font-semibold">New category</h3>
-                <p class="text-[11px] sm:text-xs text-slate-400 mt-1">Create or rename a category.</p>
+                <h3 id="category-modal-title" class="text-sm sm:text-base font-semibold text-slate-800">New category</h3>
+                <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Create or rename a category.</p>
               </div>
-              <button type="button" id="btn-close-category-modal" class="focus-outline text-slate-400 hover:text-slate-200 text-lg leading-none">×</button>
+              <button type="button" id="btn-close-category-modal" class="focus-outline text-slate-400 hover:text-slate-600 text-lg leading-none">×</button>
             </div>
 
             <input type="hidden" id="category-id" />
 
             <div class="flex flex-col gap-1">
-              <label for="category-name" class="text-[11px] text-slate-300 font-medium">Category name</label>
-              <input id="category-name" type="text" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100" />
+              <label for="category-name" class="text-[11px] text-slate-600 font-medium">Category name</label>
+              <input id="category-name" type="text" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
             </div>
 
             <div class="flex flex-col gap-1">
-              <label for="category-icon" class="text-[11px] text-slate-300 font-medium">Icon (Image)</label>
-              <input id="category-icon" type="file" accept="image/*" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 file:mr-4 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-500 file:text-slate-950 hover:file:bg-teal-400" />
+              <label for="category-icon" class="text-[11px] text-slate-600 font-medium">Icon (Image)</label>
+              <input id="category-icon" type="file" accept="image/*" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-50 border border-slate-300 text-slate-700 file:mr-4 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-500 file:text-white hover:file:bg-teal-600" />
               <input type="hidden" id="category-icon-url" />
             </div>
 
             <div class="flex flex-col gap-1">
-              <label for="category-description" class="text-[11px] text-slate-300 font-medium">Description</label>
-              <input id="category-description" type="text" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100" />
+              <label for="category-description" class="text-[11px] text-slate-600 font-medium">Description</label>
+              <input id="category-description" type="text" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
             </div>
 
             <div class="flex items-center justify-between gap-3 mt-1">
-              <p id="category-form-message" class="text-[11px] text-slate-400"></p>
+              <p id="category-form-message" class="text-[11px] text-slate-500"></p>
               <div class="flex items-center gap-2">
-                <button type="button" id="btn-cancel-category" class="focus-outline px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-[11px] sm:text-xs text-slate-200 hover:border-slate-500">Cancel</button>
-                <button type="submit" id="btn-save-category" class="focus-outline px-3 py-1.5 rounded-lg bg-teal-500 text-slate-950 text-[11px] sm:text-xs font-semibold hover:bg-teal-400">Save</button>
+                <button type="button" id="btn-cancel-category" class="focus-outline px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-[11px] sm:text-xs text-slate-700 hover:border-slate-400">Cancel</button>
+                <button type="submit" id="btn-save-category" class="focus-outline px-3 py-1.5 rounded-lg bg-teal-500 text-white text-[11px] sm:text-xs font-semibold hover:bg-teal-600">Save</button>
               </div>
             </div>
           </form>
@@ -675,14 +676,14 @@ function attachCategoryHandlers() {
 
     if (result.success) {
       msg.textContent = 'Saved!';
-      msg.className = 'text-[11px] text-teal-400';
+      msg.className = 'text-[11px] text-teal-600';
       setTimeout(() => {
         modal.classList.add('hidden');
         renderCategoriesPage();
       }, 500);
     } else {
       msg.textContent = result.error;
-      msg.className = 'text-[11px] text-orange-400';
+      msg.className = 'text-[11px] text-red-600';
       btn.disabled = false;
       btn.textContent = 'Save';
     }
@@ -697,33 +698,35 @@ async function renderOrdersPage() {
   const main = document.getElementById("main-content");
   if (!main) return;
 
-  main.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p class="text-slate-400">Loading orders...</p></div>';
+  main.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p class="text-slate-500">Loading orders...</p></div>';
 
   const orders = await DatabaseService.getOrders();
 
   const rowsHtml = orders.map(o => {
     let badgeClass = "inline-flex items-center px-2 py-[1px] rounded-full border text-[10px]";
-    if (o.status === "pending") badgeClass += " border-orange-500/60 text-orange-300 bg-orange-500/10";
-    else if (o.status === "shipped") badgeClass += " border-teal-500/60 text-teal-300 bg-teal-500/10";
-    else badgeClass += " border-slate-600 text-slate-200 bg-slate-700/30";
+    if (o.status === "pending") badgeClass += " border-orange-300 text-orange-700 bg-orange-50";
+    else if (o.status === "shipped") badgeClass += " border-teal-300 text-teal-700 bg-teal-50";
+    else if (o.status === "delivered") badgeClass += " border-green-300 text-green-700 bg-green-50";
+    else badgeClass += " border-slate-300 text-slate-600 bg-slate-50";
 
     const itemCount = o.items?.length || 0;
 
     return `
-      <tr class="border-b border-slate-800/80 hover:bg-slate-900/60">
-        <td class="px-3 py-2 text-[11px] sm:text-xs font-medium">${o.id.substring(0, 8)}</td>
+      <tr class="border-b border-slate-200 hover:bg-slate-50">
+        <td class="px-3 py-2 text-[11px] sm:text-xs font-medium text-slate-800">${o.id.substring(0, 8)}</td>
         <td class="px-3 py-2 text-xs sm:text-sm">
-          <div>${o.user?.full_name || 'N/A'}</div>
-          <div class="text-[10px] text-slate-400">${formatDate(o.created_at)}</div>
+          <div class="text-slate-800">${o.profile?.full_name || o.user?.full_name || 'N/A'}</div>
+          <div class="text-[10px] text-slate-500">${formatDate(o.created_at)}</div>
         </td>
-        <td class="px-3 py-2 text-[11px] sm:text-xs">${itemCount} items</td>
-        <td class="px-3 py-2 text-[11px] sm:text-xs text-orange-300 font-medium">${formatCurrency(o.total)}</td>
+        <td class="px-3 py-2 text-[11px] sm:text-xs text-slate-600">${itemCount} items</td>
+        <td class="px-3 py-2 text-[11px] sm:text-xs text-orange-600 font-medium">${formatCurrency(o.total || o.total_amount || 0)}</td>
         <td class="px-3 py-2 text-[11px] sm:text-xs">
           <span class="${badgeClass}">${o.status}</span>
         </td>
         <td class="px-3 py-2 text-right">
-          <select data-order-id="${o.id}" class="focus-outline bg-slate-900 border border-slate-700 rounded-full px-2 py-[1px] text-[11px] text-slate-200">
+          <select data-order-id="${o.id}" class="focus-outline bg-white border border-slate-300 rounded-full px-2 py-[1px] text-[11px] text-slate-700">
             <option value="pending" ${o.status === "pending" ? "selected" : ""}>Pending</option>
+            <option value="processing" ${o.status === "processing" ? "selected" : ""}>Processing</option>
             <option value="shipped" ${o.status === "shipped" ? "selected" : ""}>Shipped</option>
             <option value="delivered" ${o.status === "delivered" ? "selected" : ""}>Delivered</option>
             <option value="cancelled" ${o.status === "cancelled" ? "selected" : ""}>Cancelled</option>
@@ -736,19 +739,19 @@ async function renderOrdersPage() {
   main.innerHTML = `
     <section class="w-full h-full px-4 sm:px-6 py-4 flex flex-col gap-4 fade-in">
       <header>
-        <h2 class="text-base sm:text-lg font-semibold tracking-tight">${config.orders_title}</h2>
-        <p class="text-[11px] sm:text-xs text-slate-400 mt-1">Track order status from pending to delivered.</p>
+        <h2 class="text-base sm:text-lg font-semibold tracking-tight text-slate-800">${config.orders_title}</h2>
+        <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Track order status from pending to delivered.</p>
       </header>
 
-      <div class="flex-1 min-h-0 rounded-xl bg-slate-900/80 border border-slate-800/80 overflow-hidden flex flex-col">
-        <div class="px-3 sm:px-4 py-2 border-b border-slate-800/80">
-          <p class="text-[11px] sm:text-xs text-slate-400">Total ${orders.length} orders</p>
+      <div class="flex-1 min-h-0 rounded-xl bg-white border border-slate-200 overflow-hidden flex flex-col shadow-sm">
+        <div class="px-3 sm:px-4 py-2 border-b border-slate-200 bg-slate-50">
+          <p class="text-[11px] sm:text-xs text-slate-500">Total ${orders.length} orders</p>
         </div>
 
         <div class="flex-1 overflow-auto app-scrollbar">
           <table class="min-w-full text-left text-xs sm:text-sm">
-            <thead class="bg-slate-900/90 sticky top-0 z-10">
-              <tr class="text-[11px] sm:text-xs text-slate-400 border-b border-slate-800/80">
+            <thead class="bg-slate-50 sticky top-0 z-10">
+              <tr class="text-[11px] sm:text-xs text-slate-500 border-b border-slate-200">
                 <th scope="col" class="px-3 py-2 font-medium">Order ID</th>
                 <th scope="col" class="px-3 py-2 font-medium">Customer</th>
                 <th scope="col" class="px-3 py-2 font-medium">Items</th>
@@ -786,38 +789,41 @@ async function renderUsersPage() {
   const main = document.getElementById("main-content");
   if (!main) return;
 
-  main.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p class="text-slate-400">Loading users...</p></div>';
+  main.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p class="text-slate-500">Loading users...</p></div>';
 
   const users = await DatabaseService.getUsers();
 
   const rowsHtml = users.map(u => {
     const statusClass = u.blocked
-      ? "bg-slate-900 text-orange-300 border border-orange-500/60"
-      : "bg-slate-900 text-teal-300 border border-teal-500/60";
+      ? "bg-red-50 text-red-600 border border-red-200"
+      : "bg-green-50 text-green-600 border border-green-200";
     const statusLabel = u.blocked ? "Blocked" : "Active";
     const btnLabel = u.blocked ? "Unblock" : "Block";
+    const btnClass = u.blocked
+      ? "bg-green-50 text-green-700 border-green-300 hover:border-green-500"
+      : "bg-red-50 text-red-700 border-red-300 hover:border-red-500";
 
     return `
-      <tr class="border-b border-slate-800/80 hover:bg-slate-900/60">
+      <tr class="border-b border-slate-200 hover:bg-slate-50">
         <td class="px-3 py-2 text-xs sm:text-sm">
           <div class="flex items-center gap-2">
-            <div class="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-[11px]">
+            <div class="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-[11px] text-slate-700 font-medium">
               ${u.full_name?.charAt(0) || 'U'}
             </div>
             <div class="flex flex-col">
-              <span class="font-medium">${u.full_name || 'N/A'}</span>
-              <span class="text-[10px] text-slate-400">${u.email}</span>
+              <span class="font-medium text-slate-800">${u.full_name || 'N/A'}</span>
+              <span class="text-[10px] text-slate-500">${u.email}</span>
             </div>
           </div>
         </td>
-        <td class="px-3 py-2 text-[11px] sm:text-xs text-slate-300">${u.role}</td>
+        <td class="px-3 py-2 text-[11px] sm:text-xs text-slate-600">${u.role}</td>
         <td class="px-3 py-2 text-[11px] sm:text-xs">
           <span class="inline-flex items-center px-2 py-[1px] rounded-full ${statusClass} text-[10px]">
             ${statusLabel}
           </span>
         </td>
         <td class="px-3 py-2 text-right">
-          <button data-user-id="${u.id}" data-blocked="${u.blocked}" class="focus-outline text-[11px] px-3 py-1 rounded-full bg-slate-900 text-slate-100 border border-slate-700 hover:border-orange-500 hover:text-orange-300">
+          <button data-user-id="${u.id}" data-blocked="${u.blocked}" class="focus-outline text-[11px] px-3 py-1 rounded-full ${btnClass} border">
             ${btnLabel}
           </button>
         </td>
@@ -828,19 +834,19 @@ async function renderUsersPage() {
   main.innerHTML = `
     <section class="w-full h-full px-4 sm:px-6 py-4 flex flex-col gap-4 fade-in">
       <header>
-        <h2 class="text-base sm:text-lg font-semibold tracking-tight">${config.users_title}</h2>
-        <p class="text-[11px] sm:text-xs text-slate-400 mt-1">Review registered users and manage access.</p>
+        <h2 class="text-base sm:text-lg font-semibold tracking-tight text-slate-800">${config.users_title}</h2>
+        <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Review registered users and manage access.</p>
       </header>
 
-      <div class="flex-1 min-h-0 rounded-xl bg-slate-900/80 border border-slate-800/80 overflow-hidden flex flex-col">
-        <div class="px-3 sm:px-4 py-2 border-b border-slate-800/80">
-          <p class="text-[11px] sm:text-xs text-slate-400">Total ${users.length} users</p>
+      <div class="flex-1 min-h-0 rounded-xl bg-white border border-slate-200 overflow-hidden flex flex-col shadow-sm">
+        <div class="px-3 sm:px-4 py-2 border-b border-slate-200 bg-slate-50">
+          <p class="text-[11px] sm:text-xs text-slate-500">Total ${users.length} users</p>
         </div>
 
         <div class="flex-1 overflow-auto app-scrollbar">
           <table class="min-w-full text-left text-xs sm:text-sm">
-            <thead class="bg-slate-900/90 sticky top-0 z-10">
-              <tr class="text-[11px] sm:text-xs text-slate-400 border-b border-slate-800/80">
+            <thead class="bg-slate-50 sticky top-0 z-10">
+              <tr class="text-[11px] sm:text-xs text-slate-500 border-b border-slate-200">
                 <th scope="col" class="px-3 py-2 font-medium">User</th>
                 <th scope="col" class="px-3 py-2 font-medium">Role</th>
                 <th scope="col" class="px-3 py-2 font-medium">Status</th>
@@ -878,11 +884,11 @@ async function renderUsersPage() {
 function setActivePage(pageKey) {
   document.querySelectorAll(".nav-link").forEach(btn => {
     if (btn.dataset.page === pageKey) {
-      btn.classList.add("bg-slate-800", "text-slate-50");
-      btn.classList.remove("text-slate-300");
+      btn.classList.add("bg-slate-100", "text-slate-900");
+      btn.classList.remove("text-slate-600");
     } else {
-      btn.classList.remove("bg-slate-800", "text-slate-50");
-      btn.classList.add("text-slate-300");
+      btn.classList.remove("bg-slate-100", "text-slate-900");
+      btn.classList.add("text-slate-600");
     }
   });
 
@@ -949,4 +955,3 @@ function attachSidebarNav() {
   // Show dashboard
   setActivePage("dashboard");
 })();
-

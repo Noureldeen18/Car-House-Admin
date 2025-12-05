@@ -1,126 +1,99 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full w-full">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register - Car House</title>
-  
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
+
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
+
   <!-- Custom Styles -->
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="h-full w-full m-0 p-0 bg-slate-950">
+
+<body class="h-full w-full m-0 p-0 bg-slate-50">
   <!-- Main container -->
   <div class="w-full h-full flex items-center justify-center px-4 py-8">
     <div class="w-full max-w-md">
       <!-- Logo and header -->
       <div class="text-center mb-8 fade-in">
-        <div class="flex items-center justify-center w-16 h-16 rounded-2xl bg-teal-500/90 text-slate-950 font-bold text-2xl mx-auto mb-4">
+        <div
+          class="flex items-center justify-center w-16 h-16 rounded-2xl bg-teal-500 text-white font-bold text-2xl mx-auto mb-4 shadow-lg">
           <span aria-hidden="true">🚗</span>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-bold text-slate-100 mb-2">Car House</h1>
-        <p class="text-sm text-slate-400">Create Your Account</p>
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">Car House</h1>
+        <p class="text-sm text-slate-500">Create Your Account</p>
       </div>
 
       <!-- Register form card -->
-      <div class="card-elevated rounded-2xl bg-slate-900/80 border border-slate-800/80 px-6 py-8 fade-in">
+      <div class="card-elevated rounded-2xl bg-white border border-slate-200 px-6 py-8 fade-in shadow-lg">
         <form id="register-form" class="space-y-5">
           <!-- Full Name field -->
           <div class="space-y-2">
-            <label for="fullname" class="block text-sm font-medium text-slate-300">
+            <label for="fullname" class="block text-sm font-medium text-slate-700">
               Full Name
             </label>
-            <input 
-              type="text" 
-              id="fullname" 
-              name="fullname" 
-              required 
-              autocomplete="name"
-              placeholder="John Doe"
-              class="focus-outline w-full px-4 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-500 text-sm"
-            />
+            <input type="text" id="fullname" name="fullname" required autocomplete="name" placeholder="John Doe"
+              class="focus-outline w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-800 placeholder-slate-400 text-sm" />
           </div>
 
           <!-- Email field -->
           <div class="space-y-2">
-            <label for="email" class="block text-sm font-medium text-slate-300">
+            <label for="email" class="block text-sm font-medium text-slate-700">
               Email Address
             </label>
-            <input 
-              type="email" 
-              id="email" 
-              name="email" 
-              required 
-              autocomplete="email"
+            <input type="email" id="email" name="email" required autocomplete="email"
               placeholder="your.email@example.com"
-              class="focus-outline w-full px-4 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-500 text-sm"
-            />
+              class="focus-outline w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-800 placeholder-slate-400 text-sm" />
           </div>
 
           <!-- Password field -->
           <div class="space-y-2">
-            <label for="password" class="block text-sm font-medium text-slate-300">
+            <label for="password" class="block text-sm font-medium text-slate-700">
               Password
             </label>
-            <input 
-              type="password" 
-              id="password" 
-              name="password" 
-              required 
-              autocomplete="new-password"
-              placeholder="••••••••"
-              minlength="6"
-              class="focus-outline w-full px-4 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-500 text-sm"
-            />
+            <input type="password" id="password" name="password" required autocomplete="new-password"
+              placeholder="••••••••" minlength="6"
+              class="focus-outline w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-800 placeholder-slate-400 text-sm" />
             <p class="text-xs text-slate-500">Minimum 6 characters</p>
           </div>
 
           <!-- Confirm Password field -->
           <div class="space-y-2">
-            <label for="confirm-password" class="block text-sm font-medium text-slate-300">
+            <label for="confirm-password" class="block text-sm font-medium text-slate-700">
               Confirm Password
             </label>
-            <input 
-              type="password" 
-              id="confirm-password" 
-              name="confirm-password" 
-              required 
-              autocomplete="new-password"
-              placeholder="••••••••"
-              minlength="6"
-              class="focus-outline w-full px-4 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-500 text-sm"
-            />
+            <input type="password" id="confirm-password" name="confirm-password" required autocomplete="new-password"
+              placeholder="••••••••" minlength="6"
+              class="focus-outline w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-800 placeholder-slate-400 text-sm" />
           </div>
 
           <!-- Error message -->
-          <div id="error-message" class="hidden rounded-lg bg-orange-500/10 border border-orange-500/40 px-4 py-3">
-            <p class="text-sm text-orange-300"></p>
+          <div id="error-message" class="hidden rounded-lg bg-red-50 border border-red-200 px-4 py-3">
+            <p class="text-sm text-red-700"></p>
           </div>
 
           <!-- Success message -->
-          <div id="success-message" class="hidden rounded-lg bg-teal-500/10 border border-teal-500/40 px-4 py-3">
-            <p class="text-sm text-teal-300"></p>
+          <div id="success-message" class="hidden rounded-lg bg-green-50 border border-green-200 px-4 py-3">
+            <p class="text-sm text-green-700"></p>
           </div>
 
           <!-- Submit button -->
-          <button 
-            type="submit" 
-            id="register-btn"
-            class="focus-outline w-full px-4 py-2.5 rounded-lg bg-teal-500 text-slate-950 font-semibold text-sm hover:bg-teal-400 transition-colors"
-          >
+          <button type="submit" id="register-btn"
+            class="focus-outline w-full px-4 py-2.5 rounded-lg bg-teal-500 text-white font-semibold text-sm hover:bg-teal-600 transition-colors shadow-md">
             Create Account
           </button>
 
           <!-- Login link -->
-          <div class="text-center pt-4 border-t border-slate-800">
-            <p class="text-sm text-slate-400">
-              Already have an account? 
-              <a href="login.html" class="text-teal-400 hover:text-teal-300 font-medium">
+          <div class="text-center pt-4 border-t border-slate-200">
+            <p class="text-sm text-slate-500">
+              Already have an account?
+              <a href="login.html" class="text-teal-500 hover:text-teal-600 font-medium">
                 Sign in here
               </a>
             </p>
@@ -202,10 +175,10 @@
           if (result.success) {
             successMsg.querySelector('p').textContent = 'Account created successfully! Please check your email to verify your account.';
             successMsg.classList.remove('hidden');
-            
+
             // Reset form
             form.reset();
-            
+
             // Redirect to login after 3 seconds
             setTimeout(() => {
               window.location.href = 'login.html';
@@ -226,4 +199,5 @@
     });
   </script>
 </body>
+
 </html>
