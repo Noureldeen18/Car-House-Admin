@@ -1,328 +1,152 @@
-# 🚗 Car House - Admin Panel
+# Car House - Admin Panel
 
-A modern, full-stack admin panel for managing a car spare parts e-commerce store. Built with **Supabase**, **Tailwind CSS**, and **Vanilla JavaScript** with a beautiful dark theme.
+A modern, responsive admin panel for managing a car spare parts e-commerce store. Built with HTML, JavaScript, Tailwind CSS, and Supabase backend.
 
----
+![Car House Admin Panel](Logo.png)
 
-## 🌟 What's New
+## 🚗 Features
 
-✅ **Supabase Integration** - Full backend with authentication & database  
-✅ **Secure Login/Register** - Email-based authentication  
-✅ **Admin-Only Access** - Role-based access control  
-✅ **Real Database** - All data persisted in Supabase  
-✅ **Row Level Security** - Protected data with RLS policies  
+### Dashboard
+- **Overview Statistics**: Total products, categories, orders, and revenue
+- **Real-time Data**: Connected to Supabase for live data updates
 
----
+### Product Management
+- **Full CRUD Operations**: Create, read, update, and delete products
+- **Product Details**: Name, brand, category, car model, price, stock
+- **⭐ Rating Control**: Set product ratings (0-5 stars) with interactive slider
+- **Image Upload**: Upload product images (PNG, JPG, SVG, WebP, GIF)
+- **Category Association**: Link products to categories
 
-## ✨ Features
+### Category Management
+- **Category CRUD**: Manage product categories
+- **Icon Upload**: Upload category icons/images (supports SVG)
+- **Description Support**: Add descriptions for each category
 
-### 🔐 **Authentication**
-- Secure email/password registration and login
-- Session management with auto-logout
-- Admin-only panel access
-- Block/unblock user accounts
+### Order Management
+- **Order Tracking**: View all customer orders
+- **💰 Tax Breakdown**: Shows subtotal, 14% VAT tax, and total
+- **Status Updates**: Change order status (Pending → Processing → Shipped → Delivered)
+- **Customer Information**: View customer details and order date
 
-### 📊 **Dashboard**
-- Real-time statistics from database
-- Total products, categories, orders, and revenue
-- Clean, responsive cards with hover effects
+### User Management
+- **➕ Create Users**: Add new users with full details
+- **🔐 Role Management**: Assign roles (Customer, Admin, Super Admin)
+- **Block/Unblock**: Control user access
+- **Profile View**: See user details and status
 
-### 🛠️ **Product Management**
-- Full CRUD operations with Supabase
-- Category assignment
-- Stock and price management
-- Brand and car model compatibility tracking
-- Automatic updates reflected in UI
+## 💰 Financial Features
 
-### 🏷️ **Category Management**
-- Create, edit, and delete categories
-- Custom emoji icons
-- Description support
-- Used for product organization
-
-### 📦 **Order Management**
-- View all customer orders
-- Real-time status updates (pending → shipped → delivered)
-- Track order items and totals
-- Customer information display
-
-### 👥 **User Management**
-- View all registered users
-- Block/unblock accounts
-- Role management (admin/customer)
-- Email and name display
-
----
-
-## 🚀 Quick Start
-
-### 1. **Prerequisites**
-- Supabase account (free tier available at [supabase.com](https://supabase.com))
-- Modern web browser
-- Basic SQL knowledge (optional)
-
-### 2. **Clone or Download**
-Download this project to your local machine.
-
-### 3. **Set Up Supabase**
-📖 **See [SETUP.md](SETUP.md)** for detailed instructions
-
-**Quick version:**
-1. Create a Supabase project
-2. Run the `database.sql` script in SQL Editor
-3. Copy your Project URL and anon key
-4. Update `js/config.js` with your credentials
-
-### 4. **Open & Run**
-Open `login.html` in your browser or use a local server:
-
-```bash
-# Using Python
-python -m http.server 8000
-
-# Using Node.js
-npx http-server -p 8000
-
-# Then navigate to:
-# http://localhost:8000/login.html
-```
-
-### 5. **Create Admin User**
-1. Register via the app
-2. In Supabase dashboard, go to Table Editor → users
-3. Change your user's `role` from `customer` to `admin`
-4. Log out and log back in
-
----
-
-## 📁 Project Structure
-
-```
-car-house/
-├── index.html              # Main admin panel (protected)
-├── login.html              # Login page
-├── register.html           # Registration page
-├── database.sql            # Complete database schema
-├── SETUP.md               # Detailed setup instructions
-├── README.md              # This file
-├── css/
-│   └── styles.css         # Custom styles & animations
-└── js/
-    ├── config.js          # Supabase configuration ⚙️
-    ├── auth.js            # Authentication service
-    ├── database.js        # Database CRUD operations
-    └── app.js             # Main application logic
-```
-
----
-
-## 🎯 Usage
-
-### **First Time Setup**
-1. **Register** → Create your account at `register.html`
-2. **Set Admin Role** → Update your role in Supabase
-3. **Login** → Access the panel at `login.html`
-4. **Manage** → Start adding products, categories, and more!
-
-### **Daily Use**
-- **Dashboard** - View statistics and overview
-- **Products** - Add/edit/delete car spare parts
-- **Categories** - Organize products into groups
-- **Orders** - Track and update customer orders
-- **Users** - Manage user accounts and access
-
----
+- **Currency**: Egyptian Pound (EGP)
+- **Tax Rate**: 14% VAT automatically calculated
+- **Price Display**: All prices shown with tax breakdown
 
 ## 🛠️ Technology Stack
 
 | Technology | Purpose |
 |------------|---------|
-| **HTML5** | Semantic structure |
-| **Tailwind CSS** | Utility-first styling (CDN) |
-| **Vanilla JavaScript** | No frameworks, pure JS |
-| **Supabase** | Backend, auth, & database |
-| **PostgreSQL** | Database (via Supabase) |
-| **Row Level Security** | Data protection |
+| HTML5 | Structure |
+| Tailwind CSS | Styling (via CDN) |
+| JavaScript | Application Logic |
+| Supabase | Backend (Auth, Database, Storage) |
 
----
+## 📁 Project Structure
 
-## 🎨 Design Features
-
-- ✨ **Modern Dark Theme** - Slate + Orange + Teal color scheme
-- 🎭 **Smooth Animations** - Fade-in effects and hover transitions
-- 📱 **Fully Responsive** - Works on desktop, tablet, and mobile
-- ♿ **Accessible** - Keyboard navigation and focus outlines
-- 📜 **Custom Scrollbars** - Sleek, minimal design
-- 🎯 **Premium UI/UX** - Professional look and feel
-
----
-
-## 🔒 Security Features
-
-- 🔐 **Supabase Authentication** - Industry-standard auth
-- 🛡️ **Row Level Security (RLS)** - Database-level protection
-- 👥 **Role-Based Access** - Admin/customer separation
-- 🚫 **Account Blocking** - Disable user access instantly
-- 📧 **Email Verification** - Optional email confirmation
-- 🔑 **Session Management** - Automatic token refresh
-
----
-
-## 📊 Database Schema
-
-### Tables
-- **categories** - Product categories with icons
-- **products** - Car spare parts inventory
-- **users** - Registered users (admin/customer)
-- **orders** - Customer orders
-- **order_items** - Items within each order
-
-### Key Features
-- ✅ UUID primary keys
-- ✅ Foreign key relationships
-- ✅ Check constraints for status/role fields
-- ✅ Automatic timestamps
-- ✅ Cascade deletes where appropriate
-
----
-
-## 🔄 API Operations
-
-All database operations go through `DatabaseService`:
-
-```javascript
-// Products
-await DatabaseService.getProducts()
-await DatabaseService.createProduct(data)
-await DatabaseService.updateProduct(id, updates)
-await DatabaseService.deleteProduct(id)
-
-// Categories
-await DatabaseService.getCategories()
-await DatabaseService.createCategory(data)
-await DatabaseService.updateCategory(id, updates)
-await DatabaseService.deleteCategory(id)
-
-// Orders
-await DatabaseService.getOrders()
-await DatabaseService.updateOrderStatus(id, status)
-await DatabaseService.createOrder(orderData)
-
-// Users
-await DatabaseService.getUsers()
-await DatabaseService.updateUser(id, updates)
-
-// Statistics
-await DatabaseService.getStatistics()
+```
+car-house/
+├── index.html          # Main admin panel
+├── login.html          # Login page
+├── register.html       # Registration page
+├── Logo.png            # Brand logo
+├── database.sql        # Complete database schema
+├── css/
+│   └── styles.css      # Custom styles
+├── js/
+│   ├── app.js          # Main application
+│   ├── auth.js         # Authentication service
+│   ├── config.js       # Supabase configuration
+│   └── database.js     # Database operations
+└── *.sql               # Migration scripts
 ```
 
----
+## 🚀 Quick Start
 
-## 🚧 Future Enhancements
+### 1. Setup Supabase
 
-- [ ] Image upload with Supabase Storage
-- [ ] Advanced search and filtering
-- [ ] Export data to CSV/PDF
-- [ ] Email notifications for orders
-- [ ] Customer-facing storefront
-- [ ] Shopping cart functionality
-- [ ] Payment integration
-- [ ] Multi-language support
-- [ ] Advanced analytics dashboard
-- [ ] Inventory alerts
+1. Create a [Supabase](https://supabase.com) project
+2. Run `database.sql` in the SQL Editor
+3. Run `fix-storage.sql` for image storage
+4. Run `add-rating-column.sql` for product ratings
 
----
+### 2. Configure the App
 
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**"Failed to initialize Supabase"**
-→ Update `js/config.js` with your Supabase credentials
-
-**"Access denied. Admin privileges required"**
-→ Set your user's role to `admin` in Supabase dashboard
-
-**Login doesn't work**
-→ Check if email verification is enabled in Supabase Auth settings
-
-**Data doesn't load**
-→ Verify RLS policies are created (run `database.sql` again)
-
-📖 **See [SETUP.md](SETUP.md)** for detailed troubleshooting
-
----
-
-## 📝 Configuration
-
-### Supabase Setup
 Edit `js/config.js`:
 ```javascript
-const SUPABASE_CONFIG = {
-  url: 'YOUR_SUPABASE_URL',
-  anonKey: 'YOUR_SUPABASE_ANON_KEY'
-};
+const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
 ```
 
-### Customize UI
-Edit `css/styles.css`:
-```css
-:root {
-  --color-primary: #f97316;
-  --color-secondary: #14b8a6;
-  --color-background: #020617;
-}
+### 3. Create Admin User
+
+1. Register a new account
+2. In Supabase SQL Editor, run:
+```sql
+-- Update profile role
+UPDATE profiles SET role = 'admin' WHERE email = 'your@email.com';
+
+-- Add to admins table
+INSERT INTO admins (user_id, role, meta)
+SELECT id, 'superadmin', '{"permissions": ["all"]}'::jsonb
+FROM profiles WHERE email = 'your@email.com';
 ```
 
----
+### 4. Launch
 
-## 🤝 Contributing
+Open `index.html` in your browser or use a local server:
+```bash
+npx serve .
+```
 
-This is a single-user admin panel, but feel free to:
-- Fork and customize for your needs
-- Report issues or bugs
-- Suggest new features
-- Share improvements
+## 📦 Database Schema
 
----
+### Core Tables
+- `profiles` - User profiles (linked to Supabase Auth)
+- `admins` - Admin users with roles
+- `categories` - Product categories
+- `products` - Product catalog with ratings
+- `orders` - Customer orders
+- `order_items` - Order line items
+
+### Additional Tables
+- `product_images` - Multiple images per product
+- `inventory` - Stock management by store
+- `reviews` - Customer reviews
+- `coupons` - Discount codes
+- `audit_logs` - Admin activity tracking
+
+## 🔒 Security
+
+- **Row Level Security (RLS)**: All tables protected
+- **Role-based Access**: Admin-only operations
+- **Secure Authentication**: Supabase Auth integration
+
+## 🎨 Theme
+
+- **Light Mode**: Clean, modern light theme
+- **Primary Color**: Orange (#f97316)
+- **Secondary Color**: Teal (#0d9488)
+- **Font**: Inter (system fonts fallback)
+
+## 📱 Mobile App Integration
+
+This admin panel works with the Car House mobile app:
+- Shared Supabase backend
+- Public storage URLs for images
+- Real-time data sync
 
 ## 📄 License
 
-This project is open source and available for personal and commercial use.
+MIT License - Feel free to use for your projects.
 
 ---
 
-## 🎓 Learning Resources
-
-- [Supabase Docs](https://supabase.com/docs)
-- [Tailwind CSS Docs](https://tailwindcss.com/docs)
-- [Row Level Security Guide](https://supabase.com/docs/guides/auth/row-level-security)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
-
----
-
-## 🙏 Credits
-
-Built with:
-- [Supabase](https://supabase.com) - Backend as a Service
-- [Tailwind CSS](https://tailwindcss.com) - CSS Framework
-- Modern web standards (HTML5, ES6+ JavaScript)
-
----
-
-## 📧 Support
-
-For setup help, see **[SETUP.md](SETUP.md)**
-
-For technical issues:
-1. Check browser console (F12)
-2. Review Supabase logs
-3. Verify database schema
-
----
-
-**🚗 Car House - Drive Your Business Forward!**
-
-*Built with ❤️ for car spare parts retailers*
-#   C a r - H o u s e - A d m i n  
- 
+**Car House Admin Panel** - Built with ❤️ for car enthusiasts

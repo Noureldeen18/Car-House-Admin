@@ -86,6 +86,7 @@ CREATE TABLE IF NOT EXISTS products (
   compare_price NUMERIC(10,2),
   cost NUMERIC(10,2),
   stock INT DEFAULT 0,
+  rating NUMERIC(2,1) DEFAULT 0 CHECK (rating >= 0 AND rating <= 5),
   car_model TEXT,
   brand TEXT,
   category_id UUID REFERENCES categories(id) ON DELETE SET NULL,

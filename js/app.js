@@ -30,7 +30,7 @@ const config = {
  * @returns {string} Formatted currency string
  */
 function formatCurrency(value) {
-  return "$" + value.toFixed(2);
+  return value.toFixed(2) + " EGP";
 }
 
 /**
@@ -45,6 +45,52 @@ function formatDate(dateString) {
     month: 'short',
     day: 'numeric'
   });
+}
+
+/**
+ * Update rating display with stars
+ * @param {number} rating - Rating value (0-5)
+ */
+function updateRatingDisplay(rating) {
+  const display = document.getElementById('rating-display');
+  if (!display) return;
+
+  const fullStars = Math.floor(rating);
+  const stars = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
+  display.textContent = `${stars} (${rating.toFixed(1)})`;
+}
+
+/* ========================================== */
+/* TAX CONFIGURATION */
+/* ========================================== */
+
+const TAX_RATE = 0.14; // 14% VAT
+
+/**
+ * Calculate tax amount
+ * @param {number} subtotal - Subtotal before tax
+ * @returns {number} Tax amount
+ */
+function calculateTax(subtotal) {
+  return subtotal * TAX_RATE;
+}
+
+/**
+ * Calculate subtotal from total (reverse calculation)
+ * @param {number} total - Total including tax
+ * @returns {number} Subtotal before tax
+ */
+function calculateSubtotal(total) {
+  return total / (1 + TAX_RATE);
+}
+
+/**
+ * Calculate total with tax
+ * @param {number} subtotal - Subtotal before tax
+ * @returns {number} Total including tax
+ */
+function calculateTotalWithTax(subtotal) {
+  return subtotal * (1 + TAX_RATE);
 }
 
 /* ========================================== */
@@ -240,7 +286,11 @@ async function renderProductsPage() {
     DatabaseService.getCategories()
   ]);
 
-  const rowsHtml = products.map(p => `
+  const rowsHtml = products.map(p => {
+    const rating = p.rating || 0;
+    const stars = '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+
+    return `
     <tr class="border-b border-slate-200 hover:bg-slate-50">
       <td class="px-3 py-2">
         <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-lg">${p.category?.icon || '🛠️'}</div>
@@ -250,8 +300,13 @@ async function renderProductsPage() {
         <div class="text-[11px] text-slate-500">${p.car_model || 'Universal'}</div>
       </td>
       <td class="px-3 py-2 text-[11px] sm:text-xs text-slate-600">${p.category?.name || 'N/A'}</td>
-      <td class="px-3 py-2 text-[11px] sm:text-xs text-slate-600">${p.brand || 'N/A'}</td>
       <td class="px-3 py-2 text-[11px] sm:text-xs text-orange-600 font-medium">${formatCurrency(p.price)}</td>
+      <td class="px-3 py-2 text-[11px] sm:text-xs">
+        <div class="flex items-center gap-1">
+          <span class="text-amber-500 text-sm">${stars}</span>
+          <span class="text-slate-500">(${rating.toFixed(1)})</span>
+        </div>
+      </td>
       <td class="px-3 py-2 text-[11px] sm:text-xs">
         <span class="inline-flex items-center rounded-full px-2 py-[1px] border border-slate-300 text-slate-700 bg-slate-50">
           ${p.stock} in stock
@@ -264,7 +319,8 @@ async function renderProductsPage() {
         </div>
       </td>
     </tr>
-  `).join("");
+  `;
+  }).join("");
 
   const categoriesOptions = categories.map(c => `
     <option value="${c.id}">${c.name}</option>
@@ -295,8 +351,8 @@ async function renderProductsPage() {
                 <th scope="col" class="px-3 py-2 font-medium">Image</th>
                 <th scope="col" class="px-3 py-2 font-medium">Name & Model</th>
                 <th scope="col" class="px-3 py-2 font-medium">Category</th>
-                <th scope="col" class="px-3 py-2 font-medium">Brand</th>
                 <th scope="col" class="px-3 py-2 font-medium">Price</th>
+                <th scope="col" class="px-3 py-2 font-medium">Rating</th>
                 <th scope="col" class="px-3 py-2 font-medium">Stock</th>
                 <th scope="col" class="px-3 py-2 font-medium text-right">Actions</th>
               </tr>
@@ -356,6 +412,13 @@ async function renderProductsPage() {
               <label for="product-stock" class="text-[11px] text-slate-600 font-medium">Stock</label>
               <input id="product-stock" type="number" min="0" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
             </div>
+            <div class="flex flex-col gap-1 sm:col-span-2">
+              <label for="product-rating" class="text-[11px] text-slate-600 font-medium">Rating (0-5 stars)</label>
+              <div class="flex items-center gap-2">
+                <input id="product-rating" type="range" min="0" max="5" step="0.1" value="0" class="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500" />
+                <span id="rating-display" class="text-amber-500 text-sm min-w-[80px]">☆☆☆☆☆ (0.0)</span>
+              </div>
+            </div>
           </div>
 
           <div class="flex flex-col gap-1 mt-1">
@@ -394,7 +457,14 @@ function attachProductHandlers() {
     document.getElementById('product-image').value = ''; // Reset file input
     document.getElementById('product-form').reset();
     document.getElementById('product-form-message').textContent = '';
+    document.getElementById('product-rating').value = 0;
+    updateRatingDisplay(0);
     modal.classList.remove('hidden');
+  });
+
+  // Rating slider live update
+  document.getElementById('product-rating')?.addEventListener('input', (e) => {
+    updateRatingDisplay(parseFloat(e.target.value));
   });
 
   // Edit/Delete handlers
@@ -429,6 +499,12 @@ function attachProductHandlers() {
       document.getElementById('product-price').value = product.price;
       document.getElementById('product-stock').value = product.stock;
       document.getElementById('product-description').value = product.description || '';
+
+      // Set rating
+      const rating = product.rating || 0;
+      document.getElementById('product-rating').value = rating;
+      updateRatingDisplay(rating);
+
       modal.classList.remove('hidden');
     }
   });
@@ -448,6 +524,7 @@ function attachProductHandlers() {
       car_model: document.getElementById('product-car-model').value,
       price: parseFloat(document.getElementById('product-price').value),
       stock: parseInt(document.getElementById('product-stock').value),
+      rating: parseFloat(document.getElementById('product-rating').value) || 0,
       description: document.getElementById('product-description').value
     };
 
@@ -719,6 +796,9 @@ async function renderOrdersPage() {
     else badgeClass += " border-slate-300 text-slate-600 bg-slate-50";
 
     const itemCount = o.items?.length || 0;
+    const total = o.total || o.total_amount || 0;
+    const subtotal = calculateSubtotal(total);
+    const tax = calculateTax(subtotal);
 
     return `
       <tr class="border-b border-slate-200 hover:bg-slate-50">
@@ -728,7 +808,13 @@ async function renderOrdersPage() {
           <div class="text-[10px] text-slate-500">${formatDate(o.created_at)}</div>
         </td>
         <td class="px-3 py-2 text-[11px] sm:text-xs text-slate-600">${itemCount} items</td>
-        <td class="px-3 py-2 text-[11px] sm:text-xs text-orange-600 font-medium">${formatCurrency(o.total || o.total_amount || 0)}</td>
+        <td class="px-3 py-2 text-[11px] sm:text-xs">
+          <div class="flex flex-col gap-0.5">
+            <span class="text-slate-500">Subtotal: ${formatCurrency(subtotal)}</span>
+            <span class="text-slate-400">Tax (14%): ${formatCurrency(tax)}</span>
+            <span class="text-orange-600 font-medium">Total: ${formatCurrency(total)}</span>
+          </div>
+        </td>
         <td class="px-3 py-2 text-[11px] sm:text-xs">
           <span class="${badgeClass}">${o.status}</span>
         </td>
@@ -764,7 +850,7 @@ async function renderOrdersPage() {
                 <th scope="col" class="px-3 py-2 font-medium">Order ID</th>
                 <th scope="col" class="px-3 py-2 font-medium">Customer</th>
                 <th scope="col" class="px-3 py-2 font-medium">Items</th>
-                <th scope="col" class="px-3 py-2 font-medium">Total</th>
+                <th scope="col" class="px-3 py-2 font-medium">Amount (14% Tax)</th>
                 <th scope="col" class="px-3 py-2 font-medium">Status</th>
                 <th scope="col" class="px-3 py-2 font-medium text-right">Update</th>
               </tr>
@@ -807,10 +893,10 @@ async function renderUsersPage() {
       ? "bg-red-50 text-red-600 border border-red-200"
       : "bg-green-50 text-green-600 border border-green-200";
     const statusLabel = u.blocked ? "Blocked" : "Active";
-    const btnLabel = u.blocked ? "Unblock" : "Block";
-    const btnClass = u.blocked
-      ? "bg-green-50 text-green-700 border-green-300 hover:border-green-500"
-      : "bg-red-50 text-red-700 border-red-300 hover:border-red-500";
+    const isAdmin = u.role === 'admin' || u.role === 'superadmin' || u.isAdmin;
+    const roleClass = isAdmin
+      ? "bg-orange-50 text-orange-600 border border-orange-200"
+      : "bg-slate-50 text-slate-600 border border-slate-200";
 
     return `
       <tr class="border-b border-slate-200 hover:bg-slate-50">
@@ -825,16 +911,27 @@ async function renderUsersPage() {
             </div>
           </div>
         </td>
-        <td class="px-3 py-2 text-[11px] sm:text-xs text-slate-600">${u.role}</td>
+        <td class="px-3 py-2 text-[11px] sm:text-xs">
+          <span class="inline-flex items-center px-2 py-[1px] rounded-full ${roleClass} text-[10px]">
+            ${u.role || 'customer'}
+          </span>
+        </td>
         <td class="px-3 py-2 text-[11px] sm:text-xs">
           <span class="inline-flex items-center px-2 py-[1px] rounded-full ${statusClass} text-[10px]">
             ${statusLabel}
           </span>
         </td>
-        <td class="px-3 py-2 text-right">
-          <button data-user-id="${u.id}" data-blocked="${u.blocked}" class="focus-outline text-[11px] px-3 py-1 rounded-full ${btnClass} border">
-            ${btnLabel}
-          </button>
+        <td class="px-3 py-2">
+          <div class="flex flex-wrap gap-1 justify-end">
+            <select data-user-id="${u.id}" data-action="change-role" class="focus-outline bg-white border border-slate-300 rounded-full px-2 py-[2px] text-[10px] text-slate-700">
+              <option value="customer" ${u.role === 'customer' ? 'selected' : ''}>Customer</option>
+              <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+              <option value="superadmin" ${u.role === 'superadmin' ? 'selected' : ''}>Super Admin</option>
+            </select>
+            <button data-user-id="${u.id}" data-blocked="${u.blocked}" data-action="toggle-block" class="focus-outline text-[10px] px-2 py-[2px] rounded-full ${u.blocked ? 'bg-green-50 text-green-700 border-green-300' : 'bg-red-50 text-red-700 border-red-300'} border">
+              ${u.blocked ? 'Unblock' : 'Block'}
+            </button>
+          </div>
         </td>
       </tr>
     `;
@@ -842,9 +939,15 @@ async function renderUsersPage() {
 
   main.innerHTML = `
     <section class="w-full h-full px-4 sm:px-6 py-4 flex flex-col gap-4 fade-in">
-      <header>
-        <h2 class="text-base sm:text-lg font-semibold tracking-tight text-slate-800">${config.users_title}</h2>
-        <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Review registered users and manage access.</p>
+      <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h2 class="text-base sm:text-lg font-semibold tracking-tight text-slate-800">${config.users_title}</h2>
+          <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Manage users, roles and access permissions.</p>
+        </div>
+        <button id="btn-add-user" class="focus-outline inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500 text-white text-xs sm:text-sm font-semibold shadow-md hover:bg-orange-600">
+          <span class="text-sm">＋</span>
+          <span>Add User</span>
+        </button>
       </header>
 
       <div class="flex-1 min-h-0 rounded-xl bg-white border border-slate-200 overflow-hidden flex flex-col shadow-sm">
@@ -859,7 +962,7 @@ async function renderUsersPage() {
                 <th scope="col" class="px-3 py-2 font-medium">User</th>
                 <th scope="col" class="px-3 py-2 font-medium">Role</th>
                 <th scope="col" class="px-3 py-2 font-medium">Status</th>
-                <th scope="col" class="px-3 py-2 font-medium text-right">Action</th>
+                <th scope="col" class="px-3 py-2 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody id="users-tbody">
@@ -868,11 +971,107 @@ async function renderUsersPage() {
           </table>
         </div>
       </div>
+
+      <!-- Add User Modal -->
+      <div id="user-modal" class="hidden fixed inset-0 flex items-center justify-center z-20">
+        <div class="modal-backdrop absolute inset-0" id="user-modal-backdrop"></div>
+        <div class="relative w-full max-w-md rounded-2xl bg-white border border-slate-200 shadow-2xl mx-4">
+          <form id="user-form" class="flex flex-col gap-3 px-4 sm:px-5 py-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h3 id="user-modal-title" class="text-sm sm:text-base font-semibold text-slate-800">Create New User</h3>
+                <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Add a new user to the system.</p>
+              </div>
+              <button type="button" id="btn-close-user-modal" class="focus-outline text-slate-400 hover:text-slate-600 text-lg leading-none">×</button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+              <div class="flex flex-col gap-1 sm:col-span-2">
+                <label for="user-fullname" class="text-[11px] text-slate-600 font-medium">Full Name</label>
+                <input id="user-fullname" type="text" required placeholder="John Doe" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+              </div>
+              <div class="flex flex-col gap-1 sm:col-span-2">
+                <label for="user-email" class="text-[11px] text-slate-600 font-medium">Email Address</label>
+                <input id="user-email" type="email" required placeholder="user@example.com" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="user-password" class="text-[11px] text-slate-600 font-medium">Password</label>
+                <input id="user-password" type="password" required minlength="6" placeholder="••••••••" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="user-role" class="text-[11px] text-slate-600 font-medium">Role</label>
+                <select id="user-role" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800">
+                  <option value="customer">Customer</option>
+                  <option value="admin">Admin</option>
+                  <option value="superadmin">Super Admin</option>
+                </select>
+              </div>
+              <div class="flex flex-col gap-1 sm:col-span-2">
+                <label for="user-phone" class="text-[11px] text-slate-600 font-medium">Phone (Optional)</label>
+                <input id="user-phone" type="tel" placeholder="+20 123 456 7890" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3 mt-2">
+              <p id="user-form-message" class="text-[11px] text-slate-500"></p>
+              <div class="flex items-center gap-2">
+                <button type="button" id="btn-cancel-user" class="focus-outline px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-[11px] sm:text-xs text-slate-700 hover:border-slate-400">Cancel</button>
+                <button type="submit" id="btn-save-user" class="focus-outline px-3 py-1.5 rounded-lg bg-orange-500 text-white text-[11px] sm:text-xs font-semibold hover:bg-orange-600">Create User</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </section>
   `;
 
-  document.getElementById('users-tbody')?.addEventListener('click', async (e) => {
-    const btn = e.target.closest('button[data-user-id]');
+  attachUserHandlers();
+}
+
+function attachUserHandlers() {
+  const modal = document.getElementById("user-modal");
+  const tbody = document.getElementById("users-tbody");
+
+  // Close modal handlers
+  document.getElementById('btn-close-user-modal')?.addEventListener('click', () => modal.classList.add('hidden'));
+  document.getElementById('btn-cancel-user')?.addEventListener('click', () => modal.classList.add('hidden'));
+  document.getElementById('user-modal-backdrop')?.addEventListener('click', () => modal.classList.add('hidden'));
+
+  // Add user button
+  document.getElementById('btn-add-user')?.addEventListener('click', () => {
+    document.getElementById('user-form').reset();
+    document.getElementById('user-form-message').textContent = '';
+    modal.classList.remove('hidden');
+  });
+
+  // Handle role change
+  tbody?.addEventListener('change', async (e) => {
+    const select = e.target.closest('select[data-action="change-role"]');
+    if (!select) return;
+
+    const userId = select.dataset.userId;
+    const newRole = select.value;
+
+    const result = await DatabaseService.updateUser(userId, { role: newRole });
+
+    if (result.success) {
+      // If making admin, also add to admins table
+      if (newRole === 'admin' || newRole === 'superadmin') {
+        await DatabaseService.addAdmin(userId, newRole, { permissions: ['all'] });
+      } else {
+        // If removing admin, remove from admins table
+        await DatabaseService.removeAdmin(userId);
+      }
+      renderUsersPage();
+    } else {
+      alert('Failed to update role: ' + result.error);
+      renderUsersPage();
+    }
+  });
+
+  // Handle block/unblock
+  tbody?.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-action="toggle-block"]');
     if (!btn) return;
 
     const isBlocked = btn.dataset.blocked === 'true';
@@ -882,6 +1081,53 @@ async function renderUsersPage() {
       renderUsersPage();
     } else {
       alert('Failed to update user: ' + result.error);
+    }
+  });
+
+  // Form submission - create new user
+  document.getElementById('user-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const msg = document.getElementById('user-form-message');
+    const btn = document.getElementById('btn-save-user');
+
+    const fullName = document.getElementById('user-fullname').value.trim();
+    const email = document.getElementById('user-email').value.trim();
+    const password = document.getElementById('user-password').value;
+    const role = document.getElementById('user-role').value;
+    const phone = document.getElementById('user-phone').value.trim();
+
+    btn.disabled = true;
+    btn.textContent = 'Creating...';
+
+    try {
+      // Register the user
+      const result = await AuthService.register(email, password, fullName, phone, role);
+
+      if (result.success) {
+        // If admin role, add to admins table
+        if (role === 'admin' || role === 'superadmin') {
+          await DatabaseService.addAdmin(result.user.id, role, { permissions: ['all'] });
+        }
+
+        msg.textContent = 'User created successfully!';
+        msg.className = 'text-[11px] text-green-600';
+
+        setTimeout(() => {
+          modal.classList.add('hidden');
+          renderUsersPage();
+        }, 1000);
+      } else {
+        msg.textContent = result.error || 'Failed to create user';
+        msg.className = 'text-[11px] text-red-600';
+        btn.disabled = false;
+        btn.textContent = 'Create User';
+      }
+    } catch (error) {
+      msg.textContent = error.message || 'An error occurred';
+      msg.className = 'text-[11px] text-red-600';
+      btn.disabled = false;
+      btn.textContent = 'Create User';
     }
   });
 }

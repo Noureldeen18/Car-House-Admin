@@ -59,6 +59,19 @@ const DatabaseService = {
         }
     },
 
+    /**
+     * Get public URL for a file in storage
+     * @param {string} bucket - 'categories' or 'products'
+     * @param {string} filePath - Path to the file in the bucket
+     * @returns {string} Public URL
+     */
+    getPublicUrl(bucket, filePath) {
+        const { data: { publicUrl } } = supabase.storage
+            .from(bucket)
+            .getPublicUrl(filePath);
+        return publicUrl;
+    },
+
     /* ========================================== */
     /* CATEGORIES */
     /* ========================================== */
