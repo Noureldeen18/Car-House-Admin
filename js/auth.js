@@ -109,7 +109,8 @@ const AuthService = {
             if (authError) throw authError;
 
             // Fetch profile from profiles table
-            const { data: profileData, error: profileError } = await supabase
+            let profileData;
+            const { data: fetchedProfile, error: profileError } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', authData.user.id)
@@ -136,22 +137,40 @@ const AuthService = {
                 }
 
                 profileData = newProfile;
+            } else {
+                profileData = fetchedProfile;
             }
 
-            // Check if user is admin
-            const { data: adminData } = await supabase
-                .from('admins')
-                .select('role, meta')
-                .eq('user_id', authData.user.id)
-                .single();
+            // Check if user is admin - try admins table first
+            let adminData = null;
+            try {
+                const { data: adminResult, error: adminError } = await supabase
+                    .from('admins')
+                    .select('role, meta')
+                    .eq('user_id', authData.user.id)
+                    .single();
 
-            // Merge admin info if exists
+                if (!adminError && adminResult) {
+                    adminData = adminResult;
+                }
+            } catch (e) {
+                console.warn('Could not check admins table:', e);
+            }
+
+            // Determine admin status - check both admins table AND profiles.role
+            const isAdminFromTable = !!adminData;
+            const isAdminFromRole = profileData?.role === 'admin' || profileData?.role === 'superadmin';
+            const isAdmin = isAdminFromTable || isAdminFromRole;
+
+            // Merge admin info
             const userData = {
                 ...profileData,
-                isAdmin: !!adminData,
-                adminRole: adminData?.role || null,
+                isAdmin: isAdmin,
+                adminRole: adminData?.role || (isAdminFromRole ? profileData.role : null),
                 adminMeta: adminData?.meta || null
             };
+
+            console.log('Login successful. Admin status:', { isAdminFromTable, isAdminFromRole, isAdmin });
 
             this.currentUser = userData;
             return { success: true, user: userData };
@@ -197,19 +216,35 @@ const AuthService = {
                     return null;
                 }
 
-                // Check admin status
-                const { data: adminData } = await supabase
-                    .from('admins')
-                    .select('role, meta')
-                    .eq('user_id', session.user.id)
-                    .single();
+                // Check admin status - try admins table first
+                let adminData = null;
+                try {
+                    const { data: adminResult, error: adminError } = await supabase
+                        .from('admins')
+                        .select('role, meta')
+                        .eq('user_id', session.user.id)
+                        .single();
+
+                    if (!adminError && adminResult) {
+                        adminData = adminResult;
+                    }
+                } catch (e) {
+                    console.warn('Could not check admins table:', e);
+                }
+
+                // Determine admin status - check both admins table AND profiles.role
+                const isAdminFromTable = !!adminData;
+                const isAdminFromRole = profileData?.role === 'admin' || profileData?.role === 'superadmin';
+                const isAdmin = isAdminFromTable || isAdminFromRole;
 
                 const userData = {
                     ...profileData,
-                    isAdmin: !!adminData,
-                    adminRole: adminData?.role || null,
+                    isAdmin: isAdmin,
+                    adminRole: adminData?.role || (isAdminFromRole ? profileData.role : null),
                     adminMeta: adminData?.meta || null
                 };
+
+                console.log('Session check. Admin status:', { isAdminFromTable, isAdminFromRole, isAdmin, role: profileData?.role });
 
                 this.currentUser = userData;
                 return userData;
