@@ -70,8 +70,8 @@ function createBaseLayout() {
   header.className = "w-full flex items-center justify-between px-6 py-3 border-b border-slate-200 bg-white shadow-sm";
   header.innerHTML = `
     <div class="flex items-center gap-3">
-      <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-orange-500 text-white font-semibold text-lg shadow-md">
-        <span aria-hidden="true">🚗</span>
+      <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-white shadow-md overflow-hidden">
+        <img src="Logo.png" alt="Car House" class="w-full h-full object-contain" />
       </div>
       <div class="flex flex-col">
         <h1 id="app-title" class="text-sm sm:text-base font-semibold tracking-tight text-slate-800">${config.app_title}</h1>
@@ -508,10 +508,17 @@ async function renderCategoriesPage() {
 
   const categories = await DatabaseService.getCategories();
 
-  const listHtml = categories.map(c => `
+  const listHtml = categories.map(c => {
+    // Check if icon is a URL (image) or an emoji
+    const isImageUrl = c.icon && (c.icon.startsWith('http') || c.icon.startsWith('data:') || c.icon.endsWith('.svg') || c.icon.endsWith('.png') || c.icon.endsWith('.jpg') || c.icon.endsWith('.webp'));
+    const iconDisplay = isImageUrl
+      ? `<img src="${c.icon}" alt="${c.name}" class="w-full h-full object-contain" onerror="this.parentElement.innerHTML='🏷️'" />`
+      : (c.icon || '🏷️');
+
+    return `
     <li class="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-teal-400 card-elevated shadow-sm">
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-lg">${c.icon || '🏷️'}</div>
+        <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-lg overflow-hidden">${iconDisplay}</div>
         <div class="flex flex-col">
           <span class="text-xs sm:text-sm font-medium text-slate-800">${c.name}</span>
           <span class="text-[10px] text-slate-500">${c.description || ''}</span>
@@ -522,7 +529,8 @@ async function renderCategoriesPage() {
         <button data-action="delete-category" data-id="${c.id}" class="focus-outline text-[10px] px-2 py-[2px] rounded-full bg-white text-slate-600 border border-slate-300 hover:border-red-500 hover:text-red-600">Delete</button>
       </div>
     </li>
-  `).join("");
+  `;
+  }).join("");
 
   main.innerHTML = `
     <section class="w-full h-full px-4 sm:px-6 py-4 flex flex-col gap-4 fade-in">
@@ -565,7 +573,8 @@ async function renderCategoriesPage() {
 
             <div class="flex flex-col gap-1">
               <label for="category-icon" class="text-[11px] text-slate-600 font-medium">Icon (Image)</label>
-              <input id="category-icon" type="file" accept="image/*" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-50 border border-slate-300 text-slate-700 file:mr-4 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-500 file:text-white hover:file:bg-teal-600" />
+              <input id="category-icon" type="file" accept="image/svg+xml,image/png,image/jpeg,image/jpg,image/webp,image/gif,.svg,.png,.jpg,.jpeg,.webp,.gif" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-slate-50 border border-slate-300 text-slate-700 file:mr-4 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-500 file:text-white hover:file:bg-teal-600" />
+              <p class="text-[10px] text-slate-400">Supports: SVG, PNG, JPG, WEBP, GIF</p>
               <input type="hidden" id="category-icon-url" />
             </div>
 

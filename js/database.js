@@ -22,13 +22,28 @@ const DatabaseService = {
             if (!file) return null;
 
             // Create a unique file name
-            const fileExt = file.name.split('.').pop();
+            const fileExt = file.name.split('.').pop().toLowerCase();
             const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
             const filePath = `${fileName}`;
 
+            // Determine content type based on file extension
+            const contentTypes = {
+                'svg': 'image/svg+xml',
+                'png': 'image/png',
+                'jpg': 'image/jpeg',
+                'jpeg': 'image/jpeg',
+                'gif': 'image/gif',
+                'webp': 'image/webp'
+            };
+            const contentType = contentTypes[fileExt] || file.type || 'application/octet-stream';
+
             const { data, error } = await supabase.storage
                 .from(bucket)
-                .upload(filePath, file);
+                .upload(filePath, file, {
+                    contentType: contentType,
+                    cacheControl: '3600',
+                    upsert: false
+                });
 
             if (error) throw error;
 
