@@ -290,10 +290,36 @@ async function renderProductsPage() {
     const rating = p.rating || 0;
     const stars = '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
 
+    // Handle Image Display
+    // 1. Check for product image
+    const hasProductImage = p.images && p.images.length > 0 && p.images[0].url;
+    let imageHtml = '';
+
+    // 2. Check for category icon (as fallback or overlay)
+    const catIcon = p.category?.icon || '🛠️';
+    const isCatIconUrl = catIcon && (catIcon.startsWith('http') || catIcon.startsWith('data:') || catIcon.endsWith('.svg') || catIcon.endsWith('.png') || catIcon.endsWith('.jpg') || catIcon.endsWith('.webp'));
+
+    const catIconDisplay = isCatIconUrl
+      ? `<img src="${catIcon}" alt="${p.category?.name || 'Category'}" class="w-full h-full object-contain p-1" />`
+      : catIcon;
+
+    if (hasProductImage) {
+      // If product has image, show it. If it fails, fallback to category icon logic via hidden div
+      imageHtml = `
+            <img src="${p.images[0].url}" alt="${p.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');" />
+            <div class="hidden w-full h-full flex items-center justify-center text-lg bg-slate-100">${catIconDisplay}</div>
+        `;
+    } else {
+      // No product image, show category icon directly
+      imageHtml = `<div class="w-full h-full flex items-center justify-center text-lg bg-slate-100">${catIconDisplay}</div>`;
+    }
+
     return `
     <tr class="border-b border-slate-200 hover:bg-slate-50">
       <td class="px-3 py-2">
-        <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-lg">${p.category?.icon || '🛠️'}</div>
+        <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden relative border border-slate-200">
+            ${imageHtml}
+        </div>
       </td>
       <td class="px-3 py-2 text-xs sm:text-sm">
         <div class="font-medium text-slate-800">${p.name}</div>
@@ -606,7 +632,7 @@ async function renderCategoriesPage() {
         <button data-action="delete-category" data-id="${c.id}" class="focus-outline text-[10px] px-2 py-[2px] rounded-full bg-white text-slate-600 border border-slate-300 hover:border-red-500 hover:text-red-600">Delete</button>
       </div>
     </li>
-  `;
+    `;
   }).join("");
 
   main.innerHTML = `
@@ -671,7 +697,7 @@ async function renderCategoriesPage() {
         </div>
       </div>
     </section>
-  `;
+    `;
 
   attachCategoryHandlers();
 }
@@ -801,7 +827,7 @@ async function renderOrdersPage() {
     const tax = calculateTax(subtotal);
 
     return `
-      <tr class="border-b border-slate-200 hover:bg-slate-50">
+    <tr class="border-b border-slate-200 hover:bg-slate-50">
         <td class="px-3 py-2 text-[11px] sm:text-xs font-medium text-slate-800">${o.id.substring(0, 8)}</td>
         <td class="px-3 py-2 text-xs sm:text-sm">
           <div class="text-slate-800">${o.profile?.full_name || o.user?.full_name || 'N/A'}</div>
@@ -862,7 +888,7 @@ async function renderOrdersPage() {
         </div>
       </div>
     </section>
-  `;
+    `;
 
   document.getElementById('orders-tbody')?.addEventListener('change', async (e) => {
     const select = e.target.closest('select[data-order-id]');
@@ -899,7 +925,7 @@ async function renderUsersPage() {
       : "bg-slate-50 text-slate-600 border border-slate-200";
 
     return `
-      <tr class="border-b border-slate-200 hover:bg-slate-50">
+    <tr class="border-b border-slate-200 hover:bg-slate-50">
         <td class="px-3 py-2 text-xs sm:text-sm">
           <div class="flex items-center gap-2">
             <div class="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-[11px] text-slate-700 font-medium">
@@ -972,58 +998,58 @@ async function renderUsersPage() {
         </div>
       </div>
 
-      <!-- Add User Modal -->
-      <div id="user-modal" class="hidden fixed inset-0 flex items-center justify-center z-20">
-        <div class="modal-backdrop absolute inset-0" id="user-modal-backdrop"></div>
-        <div class="relative w-full max-w-md rounded-2xl bg-white border border-slate-200 shadow-2xl mx-4">
-          <form id="user-form" class="flex flex-col gap-3 px-4 sm:px-5 py-4">
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <h3 id="user-modal-title" class="text-sm sm:text-base font-semibold text-slate-800">Create New User</h3>
-                <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Add a new user to the system.</p>
-              </div>
-              <button type="button" id="btn-close-user-modal" class="focus-outline text-slate-400 hover:text-slate-600 text-lg leading-none">×</button>
+      <!--Add User Modal-- >
+    <div id="user-modal" class="hidden fixed inset-0 flex items-center justify-center z-20">
+      <div class="modal-backdrop absolute inset-0" id="user-modal-backdrop"></div>
+      <div class="relative w-full max-w-md rounded-2xl bg-white border border-slate-200 shadow-2xl mx-4">
+        <form id="user-form" class="flex flex-col gap-3 px-4 sm:px-5 py-4">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <h3 id="user-modal-title" class="text-sm sm:text-base font-semibold text-slate-800">Create New User</h3>
+              <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Add a new user to the system.</p>
             </div>
+            <button type="button" id="btn-close-user-modal" class="focus-outline text-slate-400 hover:text-slate-600 text-lg leading-none">×</button>
+          </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
-              <div class="flex flex-col gap-1 sm:col-span-2">
-                <label for="user-fullname" class="text-[11px] text-slate-600 font-medium">Full Name</label>
-                <input id="user-fullname" type="text" required placeholder="John Doe" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
-              </div>
-              <div class="flex flex-col gap-1 sm:col-span-2">
-                <label for="user-email" class="text-[11px] text-slate-600 font-medium">Email Address</label>
-                <input id="user-email" type="email" required placeholder="user@example.com" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
-              </div>
-              <div class="flex flex-col gap-1">
-                <label for="user-password" class="text-[11px] text-slate-600 font-medium">Password</label>
-                <input id="user-password" type="password" required minlength="6" placeholder="••••••••" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
-              </div>
-              <div class="flex flex-col gap-1">
-                <label for="user-role" class="text-[11px] text-slate-600 font-medium">Role</label>
-                <select id="user-role" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800">
-                  <option value="customer">Customer</option>
-                  <option value="admin">Admin</option>
-                  <option value="superadmin">Super Admin</option>
-                </select>
-              </div>
-              <div class="flex flex-col gap-1 sm:col-span-2">
-                <label for="user-phone" class="text-[11px] text-slate-600 font-medium">Phone (Optional)</label>
-                <input id="user-phone" type="tel" placeholder="+20 123 456 7890" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
-              </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+            <div class="flex flex-col gap-1 sm:col-span-2">
+              <label for="user-fullname" class="text-[11px] text-slate-600 font-medium">Full Name</label>
+              <input id="user-fullname" type="text" required placeholder="John Doe" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
             </div>
+            <div class="flex flex-col gap-1 sm:col-span-2">
+              <label for="user-email" class="text-[11px] text-slate-600 font-medium">Email Address</label>
+              <input id="user-email" type="email" required placeholder="user@example.com" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="user-password" class="text-[11px] text-slate-600 font-medium">Password</label>
+              <input id="user-password" type="password" required minlength="6" placeholder="••••••••" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="user-role" class="text-[11px] text-slate-600 font-medium">Role</label>
+              <select id="user-role" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800">
+                <option value="customer">Customer</option>
+                <option value="admin">Admin</option>
+                <option value="superadmin">Super Admin</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-1 sm:col-span-2">
+              <label for="user-phone" class="text-[11px] text-slate-600 font-medium">Phone (Optional)</label>
+              <input id="user-phone" type="tel" placeholder="+20 123 456 7890" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+            </div>
+          </div>
 
-            <div class="flex items-center justify-between gap-3 mt-2">
-              <p id="user-form-message" class="text-[11px] text-slate-500"></p>
-              <div class="flex items-center gap-2">
-                <button type="button" id="btn-cancel-user" class="focus-outline px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-[11px] sm:text-xs text-slate-700 hover:border-slate-400">Cancel</button>
-                <button type="submit" id="btn-save-user" class="focus-outline px-3 py-1.5 rounded-lg bg-orange-500 text-white text-[11px] sm:text-xs font-semibold hover:bg-orange-600">Create User</button>
-              </div>
+          <div class="flex items-center justify-between gap-3 mt-2">
+            <p id="user-form-message" class="text-[11px] text-slate-500"></p>
+            <div class="flex items-center gap-2">
+              <button type="button" id="btn-cancel-user" class="focus-outline px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-[11px] sm:text-xs text-slate-700 hover:border-slate-400">Cancel</button>
+              <button type="submit" id="btn-save-user" class="focus-outline px-3 py-1.5 rounded-lg bg-orange-500 text-white text-[11px] sm:text-xs font-semibold hover:bg-orange-600">Create User</button>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
+    </div>
     </section>
-  `;
+    `;
 
   attachUserHandlers();
 }

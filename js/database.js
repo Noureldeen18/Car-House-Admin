@@ -159,7 +159,7 @@ const DatabaseService = {
                 .from('products')
                 .select(`
           *,
-          category:categories(id, name, slug),
+          category:categories(id, name, slug, icon),
           images:product_images(id, url, alt, position)
         `)
                 .order('created_at', { ascending: false });
