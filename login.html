@@ -2,7 +2,10 @@
 <html lang="en" class="h-full w-full">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="Sign in to Car House Admin Panel">
   <title>Login - Car House</title>
   
   <!-- Tailwind CSS -->
@@ -80,6 +83,17 @@
           >
             Sign In
           </button>
+
+          <!-- Forgot Password link -->
+          <div class="text-center">
+            <button 
+              type="button" 
+              id="forgot-password-btn"
+              class="text-sm text-slate-500 hover:text-orange-500 transition-colors"
+            >
+              Forgot your password?
+            </button>
+          </div>
 
           <!-- Register link -->
           <div class="text-center pt-4 border-t border-slate-200">
@@ -177,6 +191,49 @@
           errorMsg.classList.remove('hidden');
           loginBtn.disabled = false;
           loginBtn.textContent = 'Sign In';
+        }
+      });
+
+      // Forgot password handler
+      document.getElementById('forgot-password-btn').addEventListener('click', async () => {
+        const email = document.getElementById('email').value.trim();
+        
+        if (!email) {
+          errorMsg.querySelector('p').textContent = 'Please enter your email address first.';
+          errorMsg.classList.remove('hidden');
+          successMsg.classList.add('hidden');
+          return;
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          errorMsg.querySelector('p').textContent = 'Please enter a valid email address.';
+          errorMsg.classList.remove('hidden');
+          successMsg.classList.add('hidden');
+          return;
+        }
+
+        try {
+          // Get current URL origin for redirect
+          const redirectUrl = window.location.origin + window.location.pathname.replace('login.html', 'reset-password.html');
+          
+          const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: redirectUrl
+          });
+
+          if (error) {
+            throw error;
+          }
+
+          // Show success message
+          successMsg.querySelector('p').textContent = 'Password reset email sent! Check your inbox.';
+          successMsg.classList.remove('hidden');
+          errorMsg.classList.add('hidden');
+        } catch (error) {
+          errorMsg.querySelector('p').textContent = error.message || 'Failed to send reset email. Please try again.';
+          errorMsg.classList.remove('hidden');
+          successMsg.classList.add('hidden');
         }
       });
     });

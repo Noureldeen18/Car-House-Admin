@@ -268,12 +268,29 @@ CREATE TABLE IF NOT EXISTS shipments (
 );
 
 -- ============================================
+-- SERVICE TYPES TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS service_types (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL UNIQUE,
+  description TEXT,
+  estimated_duration INT, -- in minutes
+  base_price NUMERIC(10,2),
+  icon TEXT DEFAULT '🔧',
+  is_active BOOLEAN DEFAULT TRUE,
+  position INT DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ============================================
 -- WORKSHOP BOOKINGS TABLE
 -- ============================================
 CREATE TABLE IF NOT EXISTS workshop_bookings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
-  service_type TEXT NOT NULL,
+  service_type_id UUID REFERENCES service_types(id) ON DELETE SET NULL,
+  service_type TEXT NOT NULL, -- Keep for backward compatibility
   vehicle_info JSONB DEFAULT '{}',
   scheduled_date TIMESTAMP WITH TIME ZONE NOT NULL,
   status TEXT DEFAULT 'scheduled',
@@ -354,6 +371,7 @@ ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shipments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE workshop_bookings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE service_types ENABLE ROW LEVEL SECURITY;
 ALTER TABLE media ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
@@ -467,6 +485,11 @@ CREATE POLICY "bookings_select_own" ON workshop_bookings FOR SELECT USING (user_
 CREATE POLICY "bookings_select_admin" ON workshop_bookings FOR SELECT USING (is_admin());
 CREATE POLICY "bookings_insert_own" ON workshop_bookings FOR INSERT WITH CHECK (user_id = auth.uid());
 CREATE POLICY "bookings_update_admin" ON workshop_bookings FOR UPDATE USING (is_admin());
+CREATE POLICY "bookings_delete_admin" ON workshop_bookings FOR DELETE USING (is_admin());
+
+-- Service Types Policies (public read, admin write)
+CREATE POLICY "service_types_select_all" ON service_types FOR SELECT USING (true);
+CREATE POLICY "service_types_all_admin" ON service_types FOR ALL USING (is_admin());
 
 -- Media Policies
 CREATE POLICY "media_select_all" ON media FOR SELECT USING (true);
@@ -562,3 +585,19 @@ INSERT INTO products (sku, name, title, description, price, stock, car_model, br
   ('SUS-001', 'Shock Absorber', 'Front Shock Absorber', 'Front shock absorber for smooth ride', 125.00, 30, 'Ford Focus (2014-2018)', 'Monroe', 
     (SELECT id FROM categories WHERE slug = 'suspension' LIMIT 1))
 ON CONFLICT (sku) DO NOTHING;
+
+-- Insert sample service types
+INSERT INTO service_types (name, description, estimated_duration, base_price, icon, position) VALUES
+  ('Oil Change', 'Complete oil and filter change service', 30, 150.00, '🛢️', 1),
+  ('Brake Service', 'Brake inspection, pad replacement and fluid check', 60, 350.00, '🛑', 2),
+  ('Engine Repair', 'Diagnostic and repair of engine issues', 120, 800.00, '⚙️', 3),
+  ('Transmission Service', 'Transmission fluid change and inspection', 90, 500.00, '🔧', 4),
+  ('Tire Service', 'Tire rotation, balancing, and alignment', 45, 200.00, '🔴', 5),
+  ('Suspension Repair', 'Shock absorber and suspension component repair', 90, 600.00, '🦾', 6),
+  ('Electrical Repair', 'Electrical system diagnosis and repair', 60, 400.00, '⚡', 7),
+  ('AC Service', 'Air conditioning system service and recharge', 60, 300.00, '❄️', 8),
+  ('General Inspection', 'Full vehicle inspection and health check', 45, 100.00, '🔍', 9),
+  ('Body Work', 'Dent repair, painting and body restoration', 180, 1000.00, '🚗', 10),
+  ('Battery Service', 'Battery testing, charging and replacement', 30, 150.00, '🔋', 11),
+  ('Wheel Alignment', 'Precision wheel alignment service', 45, 250.00, '🎯', 12)
+ON CONFLICT (name) DO NOTHING;

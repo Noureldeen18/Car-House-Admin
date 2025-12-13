@@ -17,6 +17,8 @@ const config = {
   categories_title: "Category Management",
   orders_title: "Orders",
   users_title: "Users",
+  bookings_title: "Workshop Bookings",
+  service_types_title: "Service Types",
   footer_text: "Car House · Admin Panel"
 };
 
@@ -113,20 +115,28 @@ function createBaseLayout() {
   /* ====================================== */
 
   const header = document.createElement("header");
-  header.className = "w-full flex items-center justify-between px-6 py-3 border-b border-slate-200 bg-white shadow-sm";
+  header.className = "w-full flex items-center justify-between px-4 sm:px-6 py-3 border-b border-slate-200 bg-white shadow-sm";
   header.innerHTML = `
     <div class="flex items-center gap-3">
+      <button id="mobile-menu-btn" class="md:hidden focus-outline p-2 -ml-2 rounded-lg text-slate-600 hover:bg-slate-100" aria-label="Toggle menu">
+        <svg id="menu-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+        <svg id="close-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
       <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-white shadow-md overflow-hidden">
         <img src="Logo.png" alt="Car House" class="w-full h-full object-contain" />
       </div>
       <div class="flex flex-col">
         <h1 id="app-title" class="text-sm sm:text-base font-semibold tracking-tight text-slate-800">${config.app_title}</h1>
-        <p class="text-[11px] sm:text-xs text-slate-500">Manage products, orders & customers</p>
+        <p class="text-[10px] sm:text-xs text-slate-500 hidden xs:block">Manage products, orders & customers</p>
       </div>
     </div>
-    <div class="flex items-center gap-3 text-xs sm:text-sm text-slate-600">
+    <div class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-slate-600">
       <span class="hidden sm:inline" id="user-name">Admin</span>
-      <button id="logout-btn" class="focus-outline px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs text-slate-700 hover:border-orange-500 hover:text-orange-600 shadow-sm">
+      <button id="logout-btn" class="focus-outline px-2 sm:px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-[11px] sm:text-xs text-slate-700 hover:border-orange-500 hover:text-orange-600 shadow-sm">
         Logout
       </button>
     </div>
@@ -143,9 +153,14 @@ function createBaseLayout() {
   /* SIDEBAR NAVIGATION */
   /* ====================================== */
 
+  // Sidebar overlay for mobile
+  const sidebarOverlay = document.createElement("div");
+  sidebarOverlay.id = "sidebar-overlay";
+  sidebarOverlay.className = "fixed inset-0 bg-black/40 z-30 hidden md:hidden";
+  
   const sidebar = document.createElement("aside");
   sidebar.id = "sidebar";
-  sidebar.className = "w-56 md:w-64 h-full bg-white border-r border-slate-200 flex flex-col shadow-sm";
+  sidebar.className = "fixed md:relative inset-y-0 left-0 z-40 w-64 h-full bg-white border-r border-slate-200 flex flex-col shadow-lg md:shadow-sm transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out";
   sidebar.innerHTML = `
     <nav class="flex-1 overflow-y-auto app-scrollbar py-4">
       <ul class="space-y-1 px-3" aria-label="Main navigation">
@@ -174,6 +189,18 @@ function createBaseLayout() {
           </button>
         </li>
         <li>
+          <button data-page="bookings" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 focus-outline">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-purple-50 text-purple-600 text-sm">🔧</span>
+            <span>Bookings</span>
+          </button>
+        </li>
+        <li>
+          <button data-page="service-types" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 focus-outline">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-indigo-50 text-indigo-600 text-sm">⚙️</span>
+            <span>Services</span>
+          </button>
+        </li>
+        <li>
           <button data-page="users" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 focus-outline">
             <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-orange-50 text-orange-500 text-sm">👥</span>
             <span>Users</span>
@@ -192,6 +219,7 @@ function createBaseLayout() {
   main.setAttribute("role", "main");
   main.setAttribute("aria-live", "polite");
 
+  mainArea.appendChild(sidebarOverlay);
   mainArea.appendChild(sidebar);
   mainArea.appendChild(main);
   appWrapper.appendChild(header);
@@ -202,6 +230,36 @@ function createBaseLayout() {
   document.getElementById('logout-btn').addEventListener('click', async () => {
     await AuthService.logout();
     window.location.href = 'login.html';
+  });
+
+  // Mobile menu toggle
+  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const menuIcon = document.getElementById('menu-icon');
+  const closeIcon = document.getElementById('close-icon');
+
+  function toggleMobileMenu() {
+    const isOpen = !sidebar.classList.contains('-translate-x-full');
+    if (isOpen) {
+      sidebar.classList.add('-translate-x-full');
+      sidebarOverlay.classList.add('hidden');
+      menuIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    } else {
+      sidebar.classList.remove('-translate-x-full');
+      sidebarOverlay.classList.remove('hidden');
+      menuIcon.classList.add('hidden');
+      closeIcon.classList.remove('hidden');
+    }
+  }
+
+  mobileMenuBtn?.addEventListener('click', toggleMobileMenu);
+  sidebarOverlay?.addEventListener('click', toggleMobileMenu);
+
+  // Close mobile menu when a nav link is clicked
+  sidebar.addEventListener('click', (e) => {
+    if (e.target.closest('button[data-page]') && window.innerWidth < 768) {
+      toggleMobileMenu();
+    }
   });
 }
 
@@ -263,6 +321,44 @@ async function renderDashboard() {
           </div>
           <p class="text-lg font-semibold text-slate-800">${formatCurrency(stats.totalRevenue)}</p>
           <p class="text-[11px] text-slate-500">Total sales revenue</p>
+        </article>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-2">
+        <article class="card-elevated rounded-xl bg-white border border-slate-200 px-3 py-3 flex flex-col gap-2 shadow-sm">
+          <div class="flex items-center justify-between">
+            <h3 class="text-[11px] text-slate-500 font-medium">Workshop Bookings</h3>
+            <span class="text-xs px-2 py-[1px] rounded-full bg-purple-50 text-purple-600 border border-purple-200">Service</span>
+          </div>
+          <p class="text-lg font-semibold text-slate-800">${stats.totalBookings || 0}</p>
+          <p class="text-[11px] text-slate-500">${stats.pendingBookings || 0} pending appointments</p>
+        </article>
+
+        <article class="card-elevated rounded-xl bg-white border border-slate-200 px-3 py-3 flex flex-col gap-2 shadow-sm">
+          <div class="flex items-center justify-between">
+            <h3 class="text-[11px] text-slate-500 font-medium">Total Users</h3>
+            <span class="text-xs px-2 py-[1px] rounded-full bg-slate-100 text-slate-600 border border-slate-200">Accounts</span>
+          </div>
+          <p class="text-lg font-semibold text-slate-800">${stats.totalUsers || 0}</p>
+          <p class="text-[11px] text-slate-500">Registered customers</p>
+        </article>
+
+        <article class="card-elevated rounded-xl bg-white border border-slate-200 px-3 py-3 flex flex-col gap-2 shadow-sm">
+          <div class="flex items-center justify-between">
+            <h3 class="text-[11px] text-slate-500 font-medium">Reviews</h3>
+            <span class="text-xs px-2 py-[1px] rounded-full bg-amber-50 text-amber-600 border border-amber-200">Feedback</span>
+          </div>
+          <p class="text-lg font-semibold text-slate-800">${stats.totalReviews || 0}</p>
+          <p class="text-[11px] text-slate-500">Avg rating: ${stats.averageRating || '0.0'} ★</p>
+        </article>
+
+        <article class="card-elevated rounded-xl bg-white border border-slate-200 px-3 py-3 flex flex-col gap-2 shadow-sm">
+          <div class="flex items-center justify-between">
+            <h3 class="text-[11px] text-slate-500 font-medium">Pending Orders</h3>
+            <span class="text-xs px-2 py-[1px] rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200">Action</span>
+          </div>
+          <p class="text-lg font-semibold text-slate-800">${stats.pendingOrders || 0}</p>
+          <p class="text-[11px] text-slate-500">Awaiting processing</p>
         </article>
       </div>
     </section>
@@ -853,6 +949,9 @@ async function renderOrdersPage() {
             <option value="cancelled" ${o.status === "cancelled" ? "selected" : ""}>Cancelled</option>
           </select>
         </td>
+        <td class="px-3 py-2 text-right">
+          <button data-action="delete-order" data-id="${o.id}" class="focus-outline text-[11px] px-2 py-[2px] rounded-full bg-white text-slate-600 border border-slate-300 hover:border-red-500 hover:text-red-600">Delete</button>
+        </td>
       </tr>
     `;
   }).join("");
@@ -878,7 +977,8 @@ async function renderOrdersPage() {
                 <th scope="col" class="px-3 py-2 font-medium">Items</th>
                 <th scope="col" class="px-3 py-2 font-medium">Amount (14% Tax)</th>
                 <th scope="col" class="px-3 py-2 font-medium">Status</th>
-                <th scope="col" class="px-3 py-2 font-medium text-right">Update</th>
+                <th scope="col" class="px-3 py-2 font-medium">Update</th>
+                <th scope="col" class="px-3 py-2 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody id="orders-tbody">
@@ -898,6 +998,20 @@ async function renderOrdersPage() {
     if (!result.success) {
       alert('Failed to update: ' + result.error);
       renderOrdersPage();
+    }
+  });
+
+  document.getElementById('orders-tbody')?.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-action="delete-order"]');
+    if (!btn) return;
+
+    if (confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
+      const result = await DatabaseService.deleteOrder(btn.dataset.id);
+      if (result.success) {
+        renderOrdersPage();
+      } else {
+        alert('Failed to delete order: ' + result.error);
+      }
     }
   });
 }
@@ -1159,6 +1273,489 @@ function attachUserHandlers() {
 }
 
 /* ========================================== */
+/* WORKSHOP BOOKINGS PAGE */
+/* ========================================== */
+
+async function renderBookingsPage() {
+  const main = document.getElementById("main-content");
+  if (!main) return;
+
+  main.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p class="text-slate-500">Loading bookings...</p></div>';
+
+  const [bookings, users, serviceTypes] = await Promise.all([
+    DatabaseService.getBookings(),
+    DatabaseService.getUsers(),
+    DatabaseService.getServiceTypes(true) // Only active service types
+  ]);
+
+  const rowsHtml = bookings.map(b => {
+    let badgeClass = "inline-flex items-center px-2 py-[1px] rounded-full border text-[10px]";
+    if (b.status === "scheduled") badgeClass += " border-blue-300 text-blue-700 bg-blue-50";
+    else if (b.status === "pending") badgeClass += " border-orange-300 text-orange-700 bg-orange-50";
+    else if (b.status === "in_progress") badgeClass += " border-purple-300 text-purple-700 bg-purple-50";
+    else if (b.status === "completed") badgeClass += " border-green-300 text-green-700 bg-green-50";
+    else if (b.status === "cancelled") badgeClass += " border-red-300 text-red-700 bg-red-50";
+    else badgeClass += " border-slate-300 text-slate-600 bg-slate-50";
+
+    const vehicleInfo = b.vehicle_info || {};
+    const vehicleDisplay = vehicleInfo.make 
+      ? `${vehicleInfo.make} ${vehicleInfo.model || ''} ${vehicleInfo.year || ''}`.trim()
+      : vehicleInfo.description || 'N/A';
+
+    const scheduledDate = new Date(b.scheduled_date);
+    const dateFormatted = scheduledDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    const timeFormatted = scheduledDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+    return `
+    <tr class="border-b border-slate-200 hover:bg-slate-50">
+      <td class="px-3 py-2 text-[11px] sm:text-xs font-medium text-slate-800">${b.id.substring(0, 8)}</td>
+      <td class="px-3 py-2 text-xs sm:text-sm">
+        <div class="text-slate-800">${b.profile?.full_name || 'Guest'}</div>
+        <div class="text-[10px] text-slate-500">${b.profile?.phone || b.profile?.email || 'No contact'}</div>
+      </td>
+      <td class="px-3 py-2 text-[11px] sm:text-xs">
+        <div class="text-slate-800 font-medium">${b.service_type}</div>
+        <div class="text-[10px] text-slate-500">${vehicleDisplay}</div>
+      </td>
+      <td class="px-3 py-2 text-[11px] sm:text-xs">
+        <div class="text-slate-800">${dateFormatted}</div>
+        <div class="text-[10px] text-slate-500">${timeFormatted}</div>
+      </td>
+      <td class="px-3 py-2"><span class="${badgeClass}">${b.status}</span></td>
+      <td class="px-3 py-2 text-[11px] sm:text-xs text-slate-600 max-w-[150px] truncate">${b.notes || '-'}</td>
+      <td class="px-3 py-2">
+        <div class="flex flex-wrap gap-1.5">
+          <select data-booking-id="${b.id}" data-action="change-status" class="focus-outline bg-white border border-slate-300 rounded-full px-2 py-[1px] text-[10px] text-slate-700">
+            <option value="scheduled" ${b.status === "scheduled" ? "selected" : ""}>Scheduled</option>
+            <option value="pending" ${b.status === "pending" ? "selected" : ""}>Pending</option>
+            <option value="in_progress" ${b.status === "in_progress" ? "selected" : ""}>In Progress</option>
+            <option value="completed" ${b.status === "completed" ? "selected" : ""}>Completed</option>
+            <option value="cancelled" ${b.status === "cancelled" ? "selected" : ""}>Cancelled</option>
+          </select>
+          <button data-action="edit-booking" data-id="${b.id}" class="focus-outline text-[10px] px-2 py-[2px] rounded-full bg-white text-slate-700 border border-slate-300 hover:border-teal-500 hover:text-teal-600">Edit</button>
+          <button data-action="delete-booking" data-id="${b.id}" class="focus-outline text-[10px] px-2 py-[2px] rounded-full bg-white text-slate-600 border border-slate-300 hover:border-red-500 hover:text-red-600">Delete</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
+
+  const userOptions = users.map(u => `<option value="${u.id}">${u.full_name || u.email}</option>`).join("");
+  const serviceOptions = serviceTypes.map(s => `<option value="${s.name}">${s.icon} ${s.name}</option>`).join("");
+
+  main.innerHTML = `
+    <section class="w-full h-full px-4 sm:px-6 py-4 flex flex-col gap-4 fade-in">
+      <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h2 class="text-base sm:text-lg font-semibold tracking-tight text-slate-800">${config.bookings_title}</h2>
+          <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Manage workshop appointments and service bookings.</p>
+        </div>
+        <button id="btn-add-booking" class="focus-outline inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500 text-white text-xs sm:text-sm font-semibold shadow-md hover:bg-purple-600">
+          <span class="text-sm">＋</span><span>Add Booking</span>
+        </button>
+      </header>
+      <div class="flex-1 min-h-0 rounded-xl bg-white border border-slate-200 overflow-hidden flex flex-col shadow-sm">
+        <div class="px-3 sm:px-4 py-2 border-b border-slate-200 bg-slate-50">
+          <p class="text-[11px] sm:text-xs text-slate-500">Total ${bookings.length} bookings</p>
+        </div>
+        <div class="flex-1 overflow-auto app-scrollbar">
+          <table class="min-w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-50 sticky top-0 z-10">
+              <tr class="text-[11px] sm:text-xs text-slate-500 border-b border-slate-200">
+                <th scope="col" class="px-3 py-2 font-medium">ID</th>
+                <th scope="col" class="px-3 py-2 font-medium">Customer</th>
+                <th scope="col" class="px-3 py-2 font-medium">Service & Vehicle</th>
+                <th scope="col" class="px-3 py-2 font-medium">Scheduled</th>
+                <th scope="col" class="px-3 py-2 font-medium">Status</th>
+                <th scope="col" class="px-3 py-2 font-medium">Notes</th>
+                <th scope="col" class="px-3 py-2 font-medium text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-tbody">${rowsHtml}</tbody>
+          </table>
+        </div>
+      </div>
+      <div id="booking-modal" class="hidden fixed inset-0 flex items-center justify-center z-20">
+        <div class="modal-backdrop absolute inset-0" id="booking-modal-backdrop"></div>
+        <div class="relative w-full max-w-lg rounded-2xl bg-white border border-slate-200 shadow-2xl mx-4">
+          <form id="booking-form" class="flex flex-col gap-3 px-4 sm:px-5 py-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h3 id="booking-modal-title" class="text-sm sm:text-base font-semibold text-slate-800">New Booking</h3>
+                <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Schedule a workshop appointment.</p>
+              </div>
+              <button type="button" id="btn-close-booking-modal" class="focus-outline text-slate-400 hover:text-slate-600 text-lg leading-none">×</button>
+            </div>
+            <input type="hidden" id="booking-id" />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+              <div class="flex flex-col gap-1 sm:col-span-2">
+                <label for="booking-user" class="text-[11px] text-slate-600 font-medium">Customer</label>
+                <select id="booking-user" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800">
+                  <option value="">Select customer (optional)</option>${userOptions}
+                </select>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="booking-service" class="text-[11px] text-slate-600 font-medium">Service Type</label>
+                <select id="booking-service" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800">
+                  <option value="">Select service</option>
+                  ${serviceOptions}
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="booking-date" class="text-[11px] text-slate-600 font-medium">Scheduled Date & Time</label>
+                <input id="booking-date" type="datetime-local" required class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="booking-vehicle-make" class="text-[11px] text-slate-600 font-medium">Vehicle Make</label>
+                <input id="booking-vehicle-make" type="text" placeholder="e.g., Toyota" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="booking-vehicle-model" class="text-[11px] text-slate-600 font-medium">Vehicle Model</label>
+                <input id="booking-vehicle-model" type="text" placeholder="e.g., Camry" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="booking-vehicle-year" class="text-[11px] text-slate-600 font-medium">Vehicle Year</label>
+                <input id="booking-vehicle-year" type="number" min="1900" max="2030" placeholder="e.g., 2020" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="booking-status" class="text-[11px] text-slate-600 font-medium">Status</label>
+                <select id="booking-status" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800">
+                  <option value="scheduled">Scheduled</option>
+                  <option value="pending">Pending</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div class="flex flex-col gap-1 sm:col-span-2">
+                <label for="booking-notes" class="text-[11px] text-slate-600 font-medium">Notes</label>
+                <textarea id="booking-notes" rows="2" placeholder="Additional details..." class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800"></textarea>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3 mt-1">
+              <p id="booking-form-message" class="text-[11px] text-slate-500"></p>
+              <div class="flex items-center gap-2">
+                <button type="button" id="btn-cancel-booking" class="focus-outline px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-[11px] sm:text-xs text-slate-700 hover:border-slate-400">Cancel</button>
+                <button type="submit" id="btn-save-booking" class="focus-outline px-3 py-1.5 rounded-lg bg-purple-500 text-white text-[11px] sm:text-xs font-semibold hover:bg-purple-600">Save</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>`;
+
+  attachBookingHandlers();
+}
+
+function attachBookingHandlers() {
+  const modal = document.getElementById("booking-modal");
+  const tbody = document.getElementById("bookings-tbody");
+
+  document.getElementById('btn-close-booking-modal')?.addEventListener('click', () => modal.classList.add('hidden'));
+  document.getElementById('btn-cancel-booking')?.addEventListener('click', () => modal.classList.add('hidden'));
+  document.getElementById('booking-modal-backdrop')?.addEventListener('click', () => modal.classList.add('hidden'));
+
+  document.getElementById('btn-add-booking')?.addEventListener('click', () => {
+    document.getElementById('booking-modal-title').textContent = 'New Booking';
+    document.getElementById('booking-id').value = '';
+    document.getElementById('booking-form').reset();
+    document.getElementById('booking-form-message').textContent = '';
+    modal.classList.remove('hidden');
+  });
+
+  tbody?.addEventListener('change', async (e) => {
+    const select = e.target.closest('select[data-action="change-status"]');
+    if (!select) return;
+    const result = await DatabaseService.updateBookingStatus(select.dataset.bookingId, select.value);
+    if (!result.success) {
+      alert('Failed to update status: ' + result.error);
+      renderBookingsPage();
+    }
+  });
+
+  tbody?.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const action = btn.dataset.action;
+
+    if (action === 'delete-booking') {
+      if (confirm('Are you sure you want to delete this booking?')) {
+        const result = await DatabaseService.deleteBooking(id);
+        if (result.success) renderBookingsPage();
+        else alert('Failed to delete booking: ' + result.error);
+      }
+    } else if (action === 'edit-booking') {
+      const bookings = await DatabaseService.getBookings();
+      const booking = bookings.find(b => b.id === id);
+      if (!booking) return;
+
+      document.getElementById('booking-modal-title').textContent = 'Edit Booking';
+      document.getElementById('booking-id').value = booking.id;
+      document.getElementById('booking-user').value = booking.user_id || '';
+      document.getElementById('booking-service').value = booking.service_type || '';
+      
+      if (booking.scheduled_date) {
+        const date = new Date(booking.scheduled_date);
+        document.getElementById('booking-date').value = date.toISOString().slice(0, 16);
+      }
+
+      const vehicleInfo = booking.vehicle_info || {};
+      document.getElementById('booking-vehicle-make').value = vehicleInfo.make || '';
+      document.getElementById('booking-vehicle-model').value = vehicleInfo.model || '';
+      document.getElementById('booking-vehicle-year').value = vehicleInfo.year || '';
+      document.getElementById('booking-status').value = booking.status || 'scheduled';
+      document.getElementById('booking-notes').value = booking.notes || '';
+      modal.classList.remove('hidden');
+    }
+  });
+
+  document.getElementById('booking-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('booking-form-message');
+    const btn = document.getElementById('btn-save-booking');
+    const id = document.getElementById('booking-id').value;
+
+    const vehicleInfo = {
+      make: document.getElementById('booking-vehicle-make').value.trim(),
+      model: document.getElementById('booking-vehicle-model').value.trim(),
+      year: document.getElementById('booking-vehicle-year').value ? parseInt(document.getElementById('booking-vehicle-year').value) : null
+    };
+
+    const data = {
+      user_id: document.getElementById('booking-user').value || null,
+      service_type: document.getElementById('booking-service').value,
+      scheduled_date: document.getElementById('booking-date').value,
+      vehicle_info: vehicleInfo,
+      status: document.getElementById('booking-status').value,
+      notes: document.getElementById('booking-notes').value.trim()
+    };
+
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    const result = id ? await DatabaseService.updateBooking(id, data) : await DatabaseService.createBooking(data);
+
+    if (result.success) {
+      msg.textContent = 'Saved successfully!';
+      msg.className = 'text-[11px] text-green-600';
+      setTimeout(() => { modal.classList.add('hidden'); renderBookingsPage(); }, 500);
+    } else {
+      msg.textContent = result.error;
+      msg.className = 'text-[11px] text-red-600';
+      btn.disabled = false;
+      btn.textContent = 'Save';
+    }
+  });
+}
+
+/* ========================================== */
+/* SERVICE TYPES PAGE */
+/* ========================================== */
+
+async function renderServiceTypesPage() {
+  const main = document.getElementById("main-content");
+  if (!main) return;
+
+  main.innerHTML = '<div class="w-full h-full flex items-center justify-center"><p class="text-slate-500">Loading service types...</p></div>';
+
+  const serviceTypes = await DatabaseService.getServiceTypes();
+
+  const listHtml = serviceTypes.map(s => {
+    const statusClass = s.is_active
+      ? "bg-green-50 text-green-600 border border-green-200"
+      : "bg-slate-100 text-slate-500 border border-slate-200";
+    const statusLabel = s.is_active ? "Active" : "Inactive";
+    const durationDisplay = s.estimated_duration ? `${s.estimated_duration} min` : '-';
+    const priceDisplay = s.base_price ? `${parseFloat(s.base_price).toFixed(2)} EGP` : '-';
+
+    return `
+    <li class="flex items-center justify-between gap-3 px-3 py-3 rounded-lg bg-white border border-slate-200 hover:border-indigo-400 card-elevated shadow-sm">
+      <div class="flex items-center gap-3 flex-1">
+        <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-xl">${s.icon || '🔧'}</div>
+        <div class="flex flex-col flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-slate-800">${s.name}</span>
+            <span class="inline-flex items-center px-2 py-[1px] rounded-full ${statusClass} text-[10px]">${statusLabel}</span>
+          </div>
+          <span class="text-[11px] text-slate-500 truncate">${s.description || 'No description'}</span>
+          <div class="flex items-center gap-3 mt-1">
+            <span class="text-[10px] text-slate-400">⏱️ ${durationDisplay}</span>
+            <span class="text-[10px] text-slate-400">💰 ${priceDisplay}</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <button data-action="toggle-active" data-id="${s.id}" data-active="${s.is_active}" class="focus-outline text-[10px] px-2 py-[2px] rounded-full ${s.is_active ? 'bg-orange-50 text-orange-700 border-orange-300' : 'bg-green-50 text-green-700 border-green-300'} border">
+          ${s.is_active ? 'Disable' : 'Enable'}
+        </button>
+        <button data-action="edit-service" data-id="${s.id}" class="focus-outline text-[10px] px-2 py-[2px] rounded-full bg-white text-slate-700 border border-slate-300 hover:border-teal-500 hover:text-teal-600">Edit</button>
+        <button data-action="delete-service" data-id="${s.id}" class="focus-outline text-[10px] px-2 py-[2px] rounded-full bg-white text-slate-600 border border-slate-300 hover:border-red-500 hover:text-red-600">Delete</button>
+      </div>
+    </li>`;
+  }).join("");
+
+  main.innerHTML = `
+    <section class="w-full h-full px-4 sm:px-6 py-4 flex flex-col gap-4 fade-in">
+      <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h2 class="text-base sm:text-lg font-semibold tracking-tight text-slate-800">${config.service_types_title}</h2>
+          <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Manage workshop service offerings and pricing.</p>
+        </div>
+        <button id="btn-add-service" class="focus-outline inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-md hover:bg-indigo-600">
+          <span class="text-sm">＋</span><span>Add Service</span>
+        </button>
+      </header>
+      <div class="flex-1 min-h-0 rounded-xl bg-slate-50 border border-slate-200 p-3 sm:p-4 flex flex-col gap-3">
+        <p class="text-[11px] sm:text-xs text-slate-500">You have ${serviceTypes.length} service types. ${serviceTypes.filter(s => s.is_active).length} active.</p>
+        <ul id="services-list" class="space-y-2 overflow-auto app-scrollbar">
+          ${listHtml || '<li class="text-center text-slate-400 py-8">No service types yet. Add your first service!</li>'}
+        </ul>
+      </div>
+      <div id="service-modal" class="hidden fixed inset-0 flex items-center justify-center z-20">
+        <div class="modal-backdrop absolute inset-0" id="service-modal-backdrop"></div>
+        <div class="relative w-full max-w-md rounded-2xl bg-white border border-slate-200 shadow-2xl mx-4">
+          <form id="service-form" class="flex flex-col gap-3 px-4 sm:px-5 py-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h3 id="service-modal-title" class="text-sm sm:text-base font-semibold text-slate-800">New Service Type</h3>
+                <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Create or edit a workshop service.</p>
+              </div>
+              <button type="button" id="btn-close-service-modal" class="focus-outline text-slate-400 hover:text-slate-600 text-lg leading-none">×</button>
+            </div>
+            <input type="hidden" id="service-id" />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+              <div class="flex flex-col gap-1 sm:col-span-2">
+                <label for="service-name" class="text-[11px] text-slate-600 font-medium">Service Name</label>
+                <input id="service-name" type="text" required placeholder="e.g., Oil Change" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+              </div>
+              <div class="flex flex-col gap-1 sm:col-span-2">
+                <label for="service-description" class="text-[11px] text-slate-600 font-medium">Description</label>
+                <textarea id="service-description" rows="2" placeholder="Brief description..." class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800"></textarea>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="service-duration" class="text-[11px] text-slate-600 font-medium">Duration (minutes)</label>
+                <input id="service-duration" type="number" min="0" placeholder="60" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="service-price" class="text-[11px] text-slate-600 font-medium">Base Price (EGP)</label>
+                <input id="service-price" type="number" min="0" step="0.01" placeholder="150.00" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="service-icon" class="text-[11px] text-slate-600 font-medium">Icon (Emoji)</label>
+                <input id="service-icon" type="text" maxlength="4" placeholder="🔧" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800 text-center" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="service-position" class="text-[11px] text-slate-600 font-medium">Display Order</label>
+                <input id="service-position" type="number" min="0" placeholder="1" class="focus-outline text-xs px-2 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800" />
+              </div>
+              <div class="flex items-center gap-2 sm:col-span-2">
+                <input id="service-active" type="checkbox" checked class="w-4 h-4 rounded border-slate-300 text-indigo-500 focus:ring-indigo-500" />
+                <label for="service-active" class="text-[11px] text-slate-600 font-medium">Active (visible to customers)</label>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3 mt-1">
+              <p id="service-form-message" class="text-[11px] text-slate-500"></p>
+              <div class="flex items-center gap-2">
+                <button type="button" id="btn-cancel-service" class="focus-outline px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-[11px] sm:text-xs text-slate-700 hover:border-slate-400">Cancel</button>
+                <button type="submit" id="btn-save-service" class="focus-outline px-3 py-1.5 rounded-lg bg-indigo-500 text-white text-[11px] sm:text-xs font-semibold hover:bg-indigo-600">Save</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>`;
+
+  attachServiceTypeHandlers();
+}
+
+function attachServiceTypeHandlers() {
+  const modal = document.getElementById("service-modal");
+  const list = document.getElementById("services-list");
+
+  document.getElementById('btn-close-service-modal')?.addEventListener('click', () => modal.classList.add('hidden'));
+  document.getElementById('btn-cancel-service')?.addEventListener('click', () => modal.classList.add('hidden'));
+  document.getElementById('service-modal-backdrop')?.addEventListener('click', () => modal.classList.add('hidden'));
+
+  document.getElementById('btn-add-service')?.addEventListener('click', () => {
+    document.getElementById('service-modal-title').textContent = 'New Service Type';
+    document.getElementById('service-id').value = '';
+    document.getElementById('service-form').reset();
+    document.getElementById('service-active').checked = true;
+    document.getElementById('service-form-message').textContent = '';
+    modal.classList.remove('hidden');
+  });
+
+  list?.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const action = btn.dataset.action;
+
+    if (action === 'delete-service') {
+      if (confirm('Delete this service type?')) {
+        const result = await DatabaseService.deleteServiceType(id);
+        if (result.success) renderServiceTypesPage();
+        else alert('Failed to delete: ' + result.error);
+      }
+    } else if (action === 'toggle-active') {
+      const isActive = btn.dataset.active === 'true';
+      const result = await DatabaseService.toggleServiceTypeActive(id, !isActive);
+      if (result.success) renderServiceTypesPage();
+      else alert('Failed to update: ' + result.error);
+    } else if (action === 'edit-service') {
+      const services = await DatabaseService.getServiceTypes();
+      const service = services.find(s => s.id === id);
+      if (!service) return;
+
+      document.getElementById('service-modal-title').textContent = 'Edit Service Type';
+      document.getElementById('service-id').value = service.id;
+      document.getElementById('service-name').value = service.name || '';
+      document.getElementById('service-description').value = service.description || '';
+      document.getElementById('service-duration').value = service.estimated_duration || '';
+      document.getElementById('service-price').value = service.base_price || '';
+      document.getElementById('service-icon').value = service.icon || '🔧';
+      document.getElementById('service-position').value = service.position || '';
+      document.getElementById('service-active').checked = service.is_active !== false;
+      modal.classList.remove('hidden');
+    }
+  });
+
+  document.getElementById('service-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('service-form-message');
+    const btn = document.getElementById('btn-save-service');
+    const id = document.getElementById('service-id').value;
+
+    const data = {
+      name: document.getElementById('service-name').value.trim(),
+      description: document.getElementById('service-description').value.trim(),
+      estimated_duration: document.getElementById('service-duration').value ? parseInt(document.getElementById('service-duration').value) : null,
+      base_price: document.getElementById('service-price').value ? parseFloat(document.getElementById('service-price').value) : null,
+      icon: document.getElementById('service-icon').value.trim() || '🔧',
+      position: document.getElementById('service-position').value ? parseInt(document.getElementById('service-position').value) : 0,
+      is_active: document.getElementById('service-active').checked
+    };
+
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    const result = id ? await DatabaseService.updateServiceType(id, data) : await DatabaseService.createServiceType(data);
+
+    if (result.success) {
+      msg.textContent = 'Saved!';
+      msg.className = 'text-[11px] text-green-600';
+      setTimeout(() => { modal.classList.add('hidden'); renderServiceTypesPage(); }, 500);
+    } else {
+      msg.textContent = result.error;
+      msg.className = 'text-[11px] text-red-600';
+      btn.disabled = false;
+      btn.textContent = 'Save';
+    }
+  });
+}
+
+/* ========================================== */
 /* NAVIGATION */
 /* ========================================== */
 
@@ -1178,6 +1775,8 @@ function setActivePage(pageKey) {
     products: renderProductsPage,
     categories: renderCategoriesPage,
     orders: renderOrdersPage,
+    bookings: renderBookingsPage,
+    "service-types": renderServiceTypesPage,
     users: renderUsersPage
   };
 
